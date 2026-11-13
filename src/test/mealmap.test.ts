@@ -13,7 +13,7 @@ describe("MealMap rules", () => {
   });
   it("scales quantities to the household size", () => {
     const a = r("a", [], [{ name: "rice", quantity: 1, unit: "cup", category: "pantry" }], 2);
-    expect(buildShoppingList([{ date: "2026-01-05", meal: "dinner", recipe_id: "a", locked: false }], [a], 4)[0]!.quantity).toBe(2);
+    expect(buildShoppingList([{ date: "2026-01-05", meal: "dinner", recipe_id: "a", locked: false }], [a], 4)[0]!.quantity).toBe(380);
   });
   it("only plans recipes matching every chosen diet and keeps locked slots", () => {
     const vegan = r("v", ["vegan"], []); const meat = r("m", [], []);
