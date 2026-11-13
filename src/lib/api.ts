@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Ingredient, PrepTask, Profile, Recipe, Slot } from "./mealmap";
 import { SEED_RECIPES } from "./seed-recipes";
+import { USER_RECIPES } from "./user-recipes";
 
 export type ProfileRow = Profile & { id: string; onboarded: boolean; calendar_token: string };
 
@@ -41,7 +42,15 @@ function toRecipe(r: Record<string, unknown>): Recipe {
 export async function fetchRecipes(): Promise<Recipe[]> {
   const { data, error } = await supabase.from("recipes").select("*").order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((r) => toRecipe(r as Record<string, unknown>));
+  const list = (data ?? []).map((r) => toRecipe(r as Record<string, unknown>));
+  // Accounts created before the owner's recipe pack existed get it once.
+  const titles = new Set(list.map((r) => r.title));
+  if (list.length > 0 && !USER_RECIPES.some((r) => titles.has(r.title))) {
+    const user_id = await uid();
+    const { error: e2 } = await supabase.from("recipes").insert(USER_RECIPES.map((r) => ({ ...r, user_id })) as never);
+    if (!e2) return fetchRecipes();
+  }
+  return list;
 }
 
 export async function seedRecipesIfEmpty() {
@@ -49,7 +58,7 @@ export async function seedRecipesIfEmpty() {
   if (error) throw error;
   if ((count ?? 0) > 0) return;
   const user_id = await uid();
-  const { error: e2 } = await supabase.from("recipes").insert(SEED_RECIPES.map((r) => ({ ...r, user_id })) as never);
+  const { error: e2 } = await supabase.from("recipes").insert([...SEED_RECIPES, ...USER_RECIPES].map((r) => ({ ...r, user_id })) as never);
   if (e2) throw e2;
 }
 
@@ -70,18 +79,25 @@ export async function deleteRecipe(id: string) {
   if (error) throw error;
 }
 
-export type PlanRow = { id: string | null; week_start: string; slots: Slot[]; checked_keys: string[] };
+export type WeekSettings = { diets: string[]; servings: number; days: number; meals: string[] };
+export type PlanRow = { id: string | null; week_start: string; slots: Slot[]; checked_keys: string[]; settings: WeekSettings | null };
 export async function fetchPlan(week_start: string): Promise<PlanRow> {
   const { data, error } = await supabase.from("meal_plans").select("*").eq("week_start", week_start).maybeSingle();
   if (error) throw error;
-  if (!data) return { id: null, week_start, slots: [], checked_keys: [] };
-  return { id: data.id, week_start, slots: (data.slots as unknown as Slot[]) ?? [], checked_keys: data.checked_keys ?? [] };
+  if (!data) return { id: null, week_start, slots: [], checked_keys: [], settings: null };
+  return { id: data.id, week_start, slots: (data.slots as unknown as Slot[]) ?? [], checked_keys: data.checked_keys ?? [], settings: (data.settings as unknown as WeekSettings | null) ?? null };
 }
-export async function savePlan(week_start: string, patch: { slots?: Slot[]; checked_keys?: string[] }) {
+/** Most recent week before `week_start` that has its own settings. */
+export async function fetchPreviousSettings(week_start: string): Promise<WeekSettings | null> {
+  const { data, error } = await supabase.from("meal_plans").select("settings").lt("week_start", week_start).not("settings", "is", null).order("week_start", { ascending: false }).limit(1).maybeSingle();
+  if (error) throw error;
+  return (data?.settings as unknown as WeekSettings | null) ?? null;
+}
+export async function savePlan(week_start: string, patch: { slots?: Slot[]; checked_keys?: string[]; settings?: WeekSettings }) {
   const user_id = await uid();
   const { error } = await supabase
     .from("meal_plans")
-    .upsert({ user_id, week_start, ...patch, slots: patch.slots as never, updated_at: new Date().toISOString() }, { onConflict: "user_id,week_start" });
+    .upsert({ user_id, week_start, ...patch, slots: patch.slots as never, settings: patch.settings as never, updated_at: new Date().toISOString() }, { onConflict: "user_id,week_start" });
   if (error) throw error;
 }
 
@@ -108,5 +124,6 @@ export const qk = {
   profile: ["profile"] as const,
   recipes: ["recipes"] as const,
   plan: (w: string) => ["plan", w] as const,
+  prevSettings: (w: string) => ["prevSettings", w] as const,
   custom: (w: string) => ["custom", w] as const,
 };
