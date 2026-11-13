@@ -129,7 +129,7 @@ function SwapDialog({ slot, recipes, diets, onClose, onPick, onSurprise }: { slo
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[85vh] overflow-hidden rounded-3xl p-0 sm:max-w-lg">
-        <DialogHeader className="px-5 pt-5"><DialogTitle className="font-display text-xl">Swap {MEAL_LABEL[slot.meal].toLowerCase()}</DialogTitle></DialogHeader>
+        <DialogHeader className="px-5 pt-5"><DialogTitle className="font-display text-xl">Swap {(MEAL_LABEL[slot.meal] ?? "meal").toLowerCase()}</DialogTitle></DialogHeader>
         <div className="space-y-3 px-5">
           <Button onClick={onSurprise} className="w-full rounded-full"><Shuffle className="mr-2 h-4 w-4" /> Surprise me</Button>
           <Input placeholder="Search recipes…" value={q} onChange={(e) => setQ(e.target.value)} className="rounded-xl" />

@@ -68,7 +68,7 @@ export function toISODate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 export function parseISODate(s: string): Date {
-  const [y, m, d] = s.split("-").map(Number);
+  const [y = 0, m = 1, d = 1] = s.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 export function addDays(s: string, n: number): string {
@@ -122,7 +122,7 @@ export function generatePlan(slots: Slot[], recipes: Recipe[], diets: string[], 
     if (pool.length === 0) return { ...s, recipe_id: null };
     const minUse = Math.min(...pool.map((r) => used.get(r.id) ?? 0));
     const least = pool.filter((r) => (used.get(r.id) ?? 0) === minUse);
-    const pick = least[Math.floor(rand() * least.length)];
+    const pick = least[Math.floor(rand() * least.length)]!;
     used.set(pick.id, (used.get(pick.id) ?? 0) + 1);
     return { ...s, recipe_id: pick.id };
   });
@@ -133,7 +133,7 @@ export function surpriseFor(slot: Slot, slots: Slot[], recipes: Recipe[], diets:
   const pool = recipes.filter((r) => matchesDiet(r, diets) && matchesMeal(r, slot.meal) && r.id !== slot.recipe_id);
   const fresh = pool.filter((r) => !inWeek.has(r.id));
   const from = fresh.length ? fresh : pool;
-  return from.length ? from[Math.floor(rand() * from.length)].id : null;
+  return from.length ? from[Math.floor(rand() * from.length)]!.id : null;
 }
 
 // ---------- shopping ----------
@@ -149,7 +149,7 @@ const UNIT_ALIASES: Record<string, string> = {
 };
 export function normalizeUnit(u: string): string {
   const k = (u || "").trim().toLowerCase().replace(/\.$/, "");
-  return k in UNIT_ALIASES ? UNIT_ALIASES[k] : k;
+  return UNIT_ALIASES[k] ?? k;
 }
 function normalizeName(n: string): string {
   let s = n.trim().toLowerCase().replace(/\s+/g, " ");
@@ -200,8 +200,8 @@ export function mealTime(profile: Pick<Profile, "breakfast_time" | "lunch_time" 
 
 /** Convert a wall-clock date+time in an IANA timezone to a UTC Date. */
 export function zonedToUtc(date: string, time: string, timeZone: string): Date {
-  const [y, mo, d] = date.split("-").map(Number);
-  const [h, mi] = time.split(":").map(Number);
+  const [y = 0, mo = 1, d = 1] = date.split("-").map(Number);
+  const [h = 0, mi = 0] = time.split(":").map(Number);
   const guess = Date.UTC(y, mo - 1, d, h, mi);
   const offset = tzOffsetMs(new Date(guess), timeZone);
   const first = guess - offset;
@@ -354,15 +354,15 @@ export function parseIngredientLine(line: string): Ingredient {
   let quantity: number | null = null;
   let rest = s;
   if (m) {
-    quantity = m[1].split(/\s+/).reduce((acc, part) => {
+    quantity = m[1]!.split(/\s+/).reduce((acc, part) => {
       if (part.includes("/")) {
-        const [a, b] = part.split("/").map(Number);
+        const [a = 0, b = 0] = part.split("/").map(Number);
         return acc + (b ? a / b : 0);
       }
       return acc + Number(part.replace(",", "."));
     }, 0);
     quantity = Math.round(quantity * 100) / 100;
-    rest = m[2];
+    rest = m[2] ?? "";
   }
   let unit = "";
   const first = rest.split(" ")[0]?.toLowerCase().replace(/[.,]$/, "");
@@ -370,7 +370,7 @@ export function parseIngredientLine(line: string): Ingredient {
     unit = normalizeUnit(first);
     rest = rest.split(" ").slice(1).join(" ");
   }
-  const name = rest.replace(/^of\s+/i, "").replace(/\(.*?\)/g, "").split(",")[0].trim() || line.trim();
+  const name = rest.replace(/^of\s+/i, "").replace(/\(.*?\)/g, "").split(",")[0]!.trim() || line.trim();
   return { name, quantity, unit, category: guessCategory(name) };
 }
 

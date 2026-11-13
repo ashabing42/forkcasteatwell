@@ -32,9 +32,9 @@ export async function saveProfile(patch: Partial<ProfileRow>) {
 function toRecipe(r: Record<string, unknown>): Recipe {
   return {
     ...(r as unknown as Recipe),
-    ingredients: (r.ingredients as Ingredient[]) ?? [],
-    steps: (r.steps as string[]) ?? [],
-    prep_tasks: (r.prep_tasks as PrepTask[]) ?? [],
+    ingredients: (r["ingredients"] as Ingredient[]) ?? [],
+    steps: (r["steps"] as string[]) ?? [],
+    prep_tasks: (r["prep_tasks"] as PrepTask[]) ?? [],
   };
 }
 
