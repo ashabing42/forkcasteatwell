@@ -10,6 +10,7 @@ import { useRecipes } from "@/hooks/use-mealmap";
 import { qk, saveRecipe, type RecipeInput } from "@/lib/api";
 import { CATEGORIES, CATEGORY_LABEL, DIET_TAGS, MEALS, MEAL_LABEL, guessCategory, suggestDietTags, suggestPrepTasks } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
+import { IMPORT_DRAFT_KEY } from "@/lib/spoonacular";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id_/edit")({
   head: () => ({ meta: [{ title: "Edit recipe — Forkcast" }, { name: "description", content: "Add or edit a recipe." }] }),
@@ -23,10 +24,17 @@ function EditPage() {
   const { data, isLoading } = useRecipes();
   if (isLoading) return null;
   const existing = id === "new" ? undefined : data?.find((r) => r.id === id);
-  return <RecipeForm id={existing ? id : null} initial={existing ?? EMPTY} />;
+  return <RecipeForm id={existing ? id : null} initial={existing ?? (id === "new" ? takeImportDraft() : null) ?? EMPTY} imported={!existing && id === "new" && !!sessionStorage.getItem(IMPORT_DRAFT_KEY)} />;
 }
 
-function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }) {
+// Route is client-only (under _authenticated), so sessionStorage is safe here.
+function takeImportDraft(): RecipeInput | null {
+  const raw = sessionStorage.getItem(IMPORT_DRAFT_KEY);
+  if (!raw) return null;
+  try { return JSON.parse(raw) as RecipeInput; } catch { return null; }
+}
+
+function RecipeForm({ id, initial, imported }: { id: string | null; initial: RecipeInput; imported?: boolean }) {
   const [r, setR] = useState<RecipeInput>(initial);
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -38,6 +46,7 @@ function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }
     const clean = { ...r, ingredients: r.ingredients.filter((i) => i.name.trim()), steps: r.steps.filter((s) => s.trim()), prep_tasks: r.prep_tasks.filter((t) => t.title.trim()) };
     try {
       const saved = await saveRecipe(id, clean);
+      sessionStorage.removeItem(IMPORT_DRAFT_KEY);
       await qc.invalidateQueries({ queryKey: qk.recipes });
       toast.success("Recipe saved.");
       navigate({ to: "/recipes/$id", params: { id: saved } });
@@ -46,7 +55,8 @@ function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      <h1 className="text-3xl">{id ? "Edit recipe" : "New recipe"}</h1>
+      <h1 className="text-3xl">{id ? "Edit recipe" : imported ? "Check the import" : "New recipe"}</h1>
+      {imported && <p className="text-sm text-muted-foreground">Here's what we found{r.source_url ? <> on <a href={r.source_url} target="_blank" rel="noreferrer" className="underline">the original page</a></> : null}. Tidy anything that looks off, then save.</p>}
       <Input required placeholder="Recipe title" value={r.title} onChange={(e) => set({ title: e.target.value })} className="h-12 rounded-xl text-lg" />
       <Input placeholder="Photo URL (optional)" value={r.image_url ?? ""} onChange={(e) => set({ image_url: e.target.value })} className="rounded-xl" />
       <div className="grid grid-cols-3 gap-2">
