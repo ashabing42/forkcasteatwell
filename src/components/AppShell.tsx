@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
-import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Leaf } from "lucide-react";
+import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Leaf, Archive } from "lucide-react";
 import { fetchProfile, qk } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +9,7 @@ const TABS = [
   { to: "/today", label: "Today", icon: Sun },
   { to: "/plan", label: "Plan", icon: CalendarDays },
   { to: "/shopping", label: "Shopping", icon: ShoppingBasket },
+  { to: "/pantry", label: "Pantry", icon: Archive },
   { to: "/recipes", label: "Recipes", icon: BookOpen },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
@@ -54,12 +55,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
       <main className="mx-auto max-w-4xl px-4 py-6 md:px-8 md:py-10">{children}</main>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 backdrop-blur md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
-        <div className="grid grid-cols-5">
+        <div className="grid grid-cols-6">
           {TABS.map((t) => {
             const active = pathname.startsWith(t.to);
             return (
-              <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
-                <span className={cn("rounded-full px-4 py-1 transition-colors", active && "bg-secondary")}>
+              <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
+                <span className={cn("rounded-full px-3 py-1 transition-colors", active && "bg-secondary")}>
                   <t.icon className="h-5 w-5" />
                 </span>
                 {t.label}

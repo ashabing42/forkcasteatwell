@@ -44,6 +44,30 @@ export type Database = {
         }
         Relationships: []
       }
+      pantry_items: {
+        Row: {
+          created_at: string
+          id: string
+          location: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string
+          name: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           breakfast_time: string

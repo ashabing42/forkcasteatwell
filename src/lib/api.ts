@@ -120,7 +120,23 @@ export async function deleteCustomItem(id: string) {
   if (error) throw error;
 }
 
+export type PantryItem = { id: string; name: string; location: string };
+export async function fetchPantry(): Promise<PantryItem[]> {
+  const { data, error } = await supabase.from("pantry_items").select("id,name,location").order("name");
+  if (error) throw error;
+  return data ?? [];
+}
+export async function addPantryItem(name: string, location: string) {
+  const { error } = await supabase.from("pantry_items").insert({ name, location });
+  if (error) throw error;
+}
+export async function deletePantryItem(id: string) {
+  const { error } = await supabase.from("pantry_items").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export const qk = {
+  pantry: ["pantry"] as const,
   profile: ["profile"] as const,
   recipes: ["recipes"] as const,
   plan: (w: string) => ["plan", w] as const,
