@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, ShoppingCart, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/Doodle";
 import { Input } from "@/components/ui/input";
 import { addCustomItem, addPantryItem, deletePantryItem, fetchPantry, qk } from "@/lib/api";
 import { guessCategory, weekStartOf } from "@/lib/mealmap";
@@ -41,11 +42,11 @@ function Pantry() {
         <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-lg" aria-label="Add"><Plus className="h-5 w-5" /></Button>
       </form>
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed bg-card p-6 text-center text-muted-foreground">Nothing here yet. Add what you have, or tap "I have this" on your shopping list.</p>
+        <EmptyState kind="jar"><p>Empty shelf. Add what you have, or tap the box icon on your shopping list.</p></EmptyState>
       ) : (
-        <ul className="divide-y rounded-lg border bg-card">
+        <ul>
           {items.map((i) => (
-            <li key={i.id} className="flex items-center gap-2 px-4 py-3">
+            <li key={i.id} className="dotted-rule flex items-center gap-2 py-3">
               <span className="flex-1">{i.name}</span>
               <Button size="sm" variant="secondary" className="rounded-lg" onClick={async () => {
                 await addCustomItem(week, i.name, guessCategory(i.name));

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CalendarConnect } from "@/components/CalendarConnect";
 import { Button } from "@/components/ui/button";
-import { Leaf } from "@/components/icons";
+import { Fork } from "@/components/icons";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
 import { useProfile } from "@/hooks/use-mealmap";
@@ -24,7 +24,7 @@ function Onboarding() {
   if (done) return (
     <div className="space-y-6">
       <div>
-        <Leaf className="h-8 w-8 text-primary" />
+        <Fork className="h-8 w-8" />
         <h1 className="mt-3 text-3xl">Your week is ready</h1>
         <p className="mt-2 text-muted-foreground">Want your meals and prep reminders (like "thaw the chicken tonight") in your calendar? One tap and it stays up to date.</p>
       </div>
@@ -35,7 +35,7 @@ function Onboarding() {
   return (
     <div>
       <div className="mb-8">
-        <Leaf className="h-8 w-8 text-primary" />
+        <Fork className="h-8 w-8" />
         <h1 className="mt-3 text-3xl">Let’s set up your week.</h1>
         <p className="mt-2 text-muted-foreground">Three quick questions and you'll have a plan. You can change this anytime in Settings.</p>
       </div>

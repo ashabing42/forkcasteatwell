@@ -53,7 +53,7 @@ export function ProfileForm({ initial, submitLabel, onSubmit, showTimes }: { ini
             return (
               <button type="button" key={diet.id} onClick={() => toggleDiet(diet.id)} aria-pressed={on}
                 className={cn("flex items-center gap-2 rounded-lg border p-3 text-left text-sm font-medium transition-all", on ? "border-primary bg-secondary text-secondary-foreground" : "bg-card hover:border-primary/40", diet.id === "balanced" && "col-span-2")}>
-                <span className="text-lg">{diet.emoji}</span><span className="flex-1">{diet.label}</span>{on && <Check className="h-4 w-4 text-primary" />}
+                <span className="flex-1">{diet.label}</span>{on && <Check className="h-4 w-4 text-primary" />}
               </button>
             );
           })}
