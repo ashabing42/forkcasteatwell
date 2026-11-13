@@ -51,7 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             const active = pathname.startsWith(t.to);
             return (
               <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px]", active ? "text-foreground" : "text-muted-foreground")}>
-                <t.icon className="h-6 w-6" weight={active ? "bold" : "regular"} />
+                <t.icon className="h-6 w-6" />
                 <span className={cn(active && "border-b-2 border-highlight")}>{t.label}</span>
               </Link>
             );

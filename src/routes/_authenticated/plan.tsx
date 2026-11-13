@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { CalendarConnect } from "@/components/CalendarConnect";
 import { WeekNav } from "@/components/WeekNav";
 import { usePlan, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
-import { buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, MEAL_LABEL, parseISODate, surpriseFor, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
+import { buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, MEAL_LABEL, parseISODate, surpriseFor, toISODate, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/plan")({
@@ -48,9 +48,10 @@ function PlanPage() {
       return;
     }
     update(next);
-    toast.success(hasAny ? "Fresh picks for everything you didn't lock!" : "Your week is ready");
+    toast.success(hasAny ? "Fresh picks for everything you didn't lock." : "Your week is sorted.");
   }
 
+  const todayISO = toISODate(new Date());
   const days = [...new Set(slots.map((s) => s.date))];
 
   /** Save this week's answers and fill the week straight away (locked meals are kept). */
@@ -98,7 +99,7 @@ function PlanPage() {
     <div>
       <Dialog open={askCalendar} onOpenChange={setAskCalendar}>
         <DialogContent className="rounded-xl">
-          <DialogHeader><DialogTitle>Your week is ready</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Your week is sorted</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Put this week's meals and prep reminders in your calendar. Already added it? You're all set, it updates by itself.</p>
           {profile.data && <CalendarConnect token={profile.data.calendar_token} compact />}
           <Button variant="outline" className="rounded-lg" onClick={() => setAskCalendar(false)}>Maybe later</Button>
@@ -107,7 +108,7 @@ function PlanPage() {
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl">Your week</h1>
-          <p className="text-sm text-muted-foreground">Lock what you love, reshuffle the rest.</p>
+          <p className="text-sm text-muted-foreground">Lock the keepers, reshuffle the rest.</p>
         </div>
         <WeekNav week={week} onChange={(w) => navigate({ search: { week: w } })} />
       </div>
@@ -119,46 +120,48 @@ function PlanPage() {
       )}
       <div className="mb-6 flex flex-wrap gap-2">
         <Button size="lg" onClick={generate} disabled={!profile.data || recipes.isLoading} className="h-12 flex-1 rounded-lg text-base sm:flex-none sm:px-8">
-          {hasAny ? <><RefreshCw className="mr-2 h-5 w-5" /> Regenerate unlocked meals</> : <><Sparkles className="mr-2 h-5 w-5" /> Fill my week</>}
+          {hasAny ? <><RefreshCw className="mr-2 h-5 w-5" /> Regenerate unlocked meals</> : <><Shuffle className="mr-2 h-5 w-5" /> Fill my week</>}
         </Button>
         <Button size="lg" variant="secondary" onClick={() => setEditing(true)} className="h-12 rounded-lg">
           <SlidersHorizontal className="mr-2 h-5 w-5" /> Change this week
         </Button>
       </div>
 
-      <div className="space-y-6">
-        {days.map((date) => (
-          <section key={date}>
-            <h2 className="mb-2 text-lg">{parseISODate(date).toLocaleDateString("en", { weekday: "long", month: "short", day: "numeric" })}</h2>
-            <div className="grid gap-3 sm:grid-cols-3">
+      <div className="rounded-xl border px-5 py-6 md:px-10 md:py-10">
+        <p className="text-center text-xs uppercase tracking-[0.24em] text-muted-foreground">Menu</p>
+        <div className="mx-auto mt-2 mb-6 h-px w-16 bg-border" />
+        {days.map((date) => {
+          const d = parseISODate(date);
+          const isToday = date === todayISO;
+          return (
+          <section key={date} className="dotted-rule py-5 last:border-0">
+            <h2 className="mb-3 text-center text-2xl md:text-3xl">
+              <span className={cn("px-2", isToday && "bg-highlight")}>{d.toLocaleDateString("en", { weekday: "long" })}</span>
+              <span className="ml-2 font-sans text-sm text-muted-foreground tabular">{d.toLocaleDateString("en", { day: "numeric", month: "short" })}</span>
+            </h2>
+            <ul>
               {slots.filter((s) => s.date === date).map((slot) => {
                 const r = slot.recipe_id ? byId.get(slot.recipe_id) : undefined;
                 return (
-                  <div key={slot.meal} className={cn("overflow-hidden rounded-lg border bg-card", slot.locked && "ring-2 ring-primary")}>
+                  <li key={slot.meal + (slot.recipe_id ?? "")} className="flip-in flex items-center gap-3 py-2.5">
                     {r ? (
-                      <Link to="/recipes/$id" params={{ id: r.id }} className="block">
-                        <img src={r.image_url ?? ""} alt="" className="aspect-[16/10] w-full bg-muted object-cover" loading="lazy" />
-                      </Link>
-                    ) : (
-                      <div className="flex aspect-[16/10] items-center justify-center bg-muted text-sm text-muted-foreground">Empty slot</div>
-                    )}
-                    <div className="p-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-primary">{MEAL_LABEL[slot.meal]}</p>
-                      <p className="mt-0.5 line-clamp-2 font-medium leading-snug">{r?.title ?? "Pick something tasty"}</p>
-                      {r && <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {r.prep_minutes + r.cook_minutes} min{r.prep_tasks.length > 0 && " · has prep"}</p>}
-                      <div className="mt-3 flex gap-1.5">
-                        <Button size="sm" variant="secondary" className="flex-1 rounded-lg" onClick={() => setSwapping(slot)}>Swap</Button>
-                        <Button size="icon" variant={slot.locked ? "default" : "secondary"} className="h-8 w-8 rounded-lg" aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r}>
-                          {slot.locked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
-                        </Button>
-                      </div>
+                      <Link to="/recipes/$id" params={{ id: r.id }} className="shrink-0"><img src={r.image_url ?? ""} alt="" className="h-14 w-14 rounded-lg bg-muted object-cover" loading="lazy" /></Link>
+                    ) : <div className="h-14 w-14 shrink-0 rounded-lg border border-dashed" />}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{MEAL_LABEL[slot.meal]}</p>
+                      {r ? <Link to="/recipes/$id" params={{ id: r.id }} className="block truncate font-display text-lg leading-snug">{r.title}</Link> : <p className="font-display text-lg italic text-muted-foreground">Open slot</p>}
+                      {r && <p className="text-xs text-muted-foreground tabular">{r.prep_minutes + r.cook_minutes} min{r.prep_tasks.length > 0 && <span className="text-tomato"> · prep ahead</span>}</p>}
                     </div>
-                  </div>
+                    <Button size="sm" variant="ghost" onClick={() => setSwapping(slot)}>Swap</Button>
+                    <Button size="icon" variant="ghost" className={cn("h-8 w-8", slot.locked && "bg-highlight")} aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r}>
+                      {slot.locked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4 text-muted-foreground" />}
+                    </Button>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </section>
-        ))}
+        ); })}
       </div>
 
       <SwapDialog
@@ -171,7 +174,7 @@ function PlanPage() {
           if (!swapping) return;
           const id = surpriseFor(swapping, slots, list, diets);
           if (id) setSlot(swapping, { recipe_id: id });
-          else toast("That's the only match for now — add more recipes for variety!");
+          else toast("That's the only match for now — add a few more recipes for variety.");
           setSwapping(null);
         }}
       />
