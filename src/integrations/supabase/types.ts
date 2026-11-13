@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      external_recipes: {
+        Row: {
+          created_at: string
+          id: string
+          recipe: Json
+          source_key: string
+          source_url: string | null
+          spoonacular_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipe: Json
+          source_key: string
+          source_url?: string | null
+          spoonacular_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipe?: Json
+          source_key?: string
+          source_url?: string | null
+          spoonacular_id?: number | null
+        }
+        Relationships: []
+      }
       meal_plans: {
         Row: {
           checked_keys: string[]
