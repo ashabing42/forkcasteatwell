@@ -31,13 +31,13 @@ function Landing() {
     <div className="min-h-screen">
       <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
         <span className="flex items-center gap-2 font-display text-2xl text-primary"><Leaf className="h-6 w-6" /> Forkcast</span>
-        <Button asChild variant="ghost" className="rounded-full"><Link to="/auth">Sign in</Link></Button>
+        <Button asChild variant="ghost" className="rounded-lg"><Link to="/auth">Sign in</Link></Button>
       </header>
       <section className="mx-auto grid max-w-5xl items-center gap-10 px-5 pb-16 pt-6 md:grid-cols-2">
         <div>
           <h1 className="text-4xl leading-tight md:text-5xl">Your healthy week, <span className="text-primary">planned for you.</span></h1>
           <p className="mt-4 text-lg text-muted-foreground">Tell us how you eat. Forkcast picks the recipes, writes the shopping list and nudges you when it's time to prep.</p>
-          <Button asChild size="lg" className="mt-8 h-12 rounded-full px-8 text-base"><Link to="/auth">Plan my week — it's free</Link></Button>
+          <Button asChild size="lg" className="mt-8 h-12 rounded-lg px-8 text-base"><Link to="/auth">Plan my week — it's free</Link></Button>
         </div>
         <img src={HERO} alt="A colorful healthy bowl" className="aspect-[4/3] w-full rounded-xl object-cover" />
       </section>

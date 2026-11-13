@@ -13,9 +13,9 @@ function Stepper({ value, onChange, min, max, label }: { value: number; onChange
     <div className="flex items-center justify-between rounded-lg border bg-card p-4">
       <span className="font-medium">{label}</span>
       <div className="flex items-center gap-3">
-        <Button type="button" size="icon" variant="secondary" className="rounded-full" aria-label={`Fewer ${label}`} onClick={() => onChange(Math.max(min, value - 1))}><Minus className="h-4 w-4" /></Button>
+        <Button type="button" size="icon" variant="secondary" className="rounded-lg" aria-label={`Fewer ${label}`} onClick={() => onChange(Math.max(min, value - 1))}><Minus className="h-4 w-4" /></Button>
         <span className="w-6 text-center text-lg font-semibold">{value}</span>
-        <Button type="button" size="icon" variant="secondary" className="rounded-full" aria-label={`More ${label}`} onClick={() => onChange(Math.min(max, value + 1))}><Plus className="h-4 w-4" /></Button>
+        <Button type="button" size="icon" variant="secondary" className="rounded-lg" aria-label={`More ${label}`} onClick={() => onChange(Math.min(max, value + 1))}><Plus className="h-4 w-4" /></Button>
       </div>
     </div>
   );
@@ -66,7 +66,7 @@ export function ProfileForm({ initial, submitLabel, onSubmit, showTimes }: { ini
             const on = d.meals.includes(m);
             return (
               <button type="button" key={m} onClick={() => toggleMeal(m)} aria-pressed={on}
-                className={cn("rounded-full border px-5 py-2.5 text-sm font-medium", on ? "border-primary bg-primary text-primary-foreground" : "bg-card")}>{MEAL_LABEL[m]}</button>
+                className={cn("rounded-lg border px-5 py-2.5 text-sm font-medium", on ? "border-primary bg-primary text-primary-foreground" : "bg-card")}>{MEAL_LABEL[m]}</button>
             );
           })}
         </div>
@@ -90,7 +90,7 @@ export function ProfileForm({ initial, submitLabel, onSubmit, showTimes }: { ini
           </div>
         </section>
       )}
-      <Button type="submit" size="lg" disabled={!valid || busy} className="h-12 w-full rounded-full text-base">{busy ? "Saving…" : submitLabel}</Button>
+      <Button type="submit" size="lg" disabled={!valid || busy} className="h-12 w-full rounded-lg text-base">{busy ? "Saving…" : submitLabel}</Button>
     </form>
   );
 }

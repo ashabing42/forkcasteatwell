@@ -78,7 +78,7 @@ function PlanPage() {
           <WeekNav week={week} onChange={(w) => { setEditing(false); navigate({ search: { week: w } }); }} />
         </div>
         {prev.data && !editing && (
-          <Button size="lg" onClick={() => planWeek(prev.data!)} className="mb-8 h-12 w-full rounded-full text-base">
+          <Button size="lg" onClick={() => planWeek(prev.data!)} className="mb-8 h-12 w-full rounded-lg text-base">
             <Repeat className="mr-2 h-5 w-5" /> Same as last week
           </Button>
         )}
@@ -89,7 +89,7 @@ function PlanPage() {
           submitLabel={editing ? "Update my week" : "Plan my week"}
           onSubmit={(d) => planWeek({ diets: d.diets, servings: d.servings, days: d.days, meals: d.meals })}
         />
-        {editing && <Button variant="ghost" className="mt-3 w-full rounded-full" onClick={() => setEditing(false)}>Cancel</Button>}
+        {editing && <Button variant="ghost" className="mt-3 w-full rounded-lg" onClick={() => setEditing(false)}>Cancel</Button>}
       </div>
     );
   }
@@ -101,7 +101,7 @@ function PlanPage() {
           <DialogHeader><DialogTitle>Your week is ready</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Put this week's meals and prep reminders in your calendar. Already added it? You're all set, it updates by itself.</p>
           {profile.data && <CalendarConnect token={profile.data.calendar_token} compact />}
-          <Button variant="outline" className="rounded-full" onClick={() => setAskCalendar(false)}>Maybe later</Button>
+          <Button variant="outline" className="rounded-lg" onClick={() => setAskCalendar(false)}>Maybe later</Button>
         </DialogContent>
       </Dialog>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -118,10 +118,10 @@ function PlanPage() {
         </p>
       )}
       <div className="mb-6 flex flex-wrap gap-2">
-        <Button size="lg" onClick={generate} disabled={!profile.data || recipes.isLoading} className="h-12 flex-1 rounded-full text-base sm:flex-none sm:px-8">
+        <Button size="lg" onClick={generate} disabled={!profile.data || recipes.isLoading} className="h-12 flex-1 rounded-lg text-base sm:flex-none sm:px-8">
           {hasAny ? <><RefreshCw className="mr-2 h-5 w-5" /> Regenerate unlocked meals</> : <><Sparkles className="mr-2 h-5 w-5" /> Fill my week</>}
         </Button>
-        <Button size="lg" variant="secondary" onClick={() => setEditing(true)} className="h-12 rounded-full">
+        <Button size="lg" variant="secondary" onClick={() => setEditing(true)} className="h-12 rounded-lg">
           <SlidersHorizontal className="mr-2 h-5 w-5" /> Change this week
         </Button>
       </div>
@@ -147,8 +147,8 @@ function PlanPage() {
                       <p className="mt-0.5 line-clamp-2 font-medium leading-snug">{r?.title ?? "Pick something tasty"}</p>
                       {r && <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Clock className="h-3 w-3" /> {r.prep_minutes + r.cook_minutes} min{r.prep_tasks.length > 0 && " · has prep"}</p>}
                       <div className="mt-3 flex gap-1.5">
-                        <Button size="sm" variant="secondary" className="flex-1 rounded-full" onClick={() => setSwapping(slot)}>Swap</Button>
-                        <Button size="icon" variant={slot.locked ? "default" : "secondary"} className="h-8 w-8 rounded-full" aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r}>
+                        <Button size="sm" variant="secondary" className="flex-1 rounded-lg" onClick={() => setSwapping(slot)}>Swap</Button>
+                        <Button size="icon" variant={slot.locked ? "default" : "secondary"} className="h-8 w-8 rounded-lg" aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r}>
                           {slot.locked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4" />}
                         </Button>
                       </div>
@@ -191,7 +191,7 @@ function SwapDialog({ slot, recipes, diets, onClose, onPick, onSurprise }: { slo
       <DialogContent className="max-h-[85vh] overflow-hidden rounded-xl p-0 sm:max-w-lg">
         <DialogHeader className="px-5 pt-5"><DialogTitle className="font-display text-xl">Swap {(MEAL_LABEL[slot.meal] ?? "meal").toLowerCase()}</DialogTitle></DialogHeader>
         <div className="space-y-3 px-5">
-          <Button onClick={onSurprise} className="w-full rounded-full"><Shuffle className="mr-2 h-4 w-4" /> Surprise me</Button>
+          <Button onClick={onSurprise} className="w-full rounded-lg"><Shuffle className="mr-2 h-4 w-4" /> Surprise me</Button>
           <Input placeholder="Search recipes…" value={q} onChange={(e) => setQ(e.target.value)} className="rounded-xl" />
           <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="checkbox" checked={all} onChange={(e) => setAll(e.target.checked)} /> Show all recipes, not just matches</label>
         </div>
@@ -203,7 +203,7 @@ function SwapDialog({ slot, recipes, diets, onClose, onPick, onSurprise }: { slo
             </button>
           ))}
           {options.length === 0 && <p className="py-6 text-center text-sm text-muted-foreground">No matches — try showing all recipes.</p>}
-          {slot.recipe_id && <Button variant="ghost" className="w-full rounded-full text-muted-foreground" onClick={() => onPick(null)}><X className="mr-1 h-4 w-4" /> Leave this slot empty</Button>}
+          {slot.recipe_id && <Button variant="ghost" className="w-full rounded-lg text-muted-foreground" onClick={() => onPick(null)}><X className="mr-1 h-4 w-4" /> Leave this slot empty</Button>}
         </div>
       </DialogContent>
     </Dialog>

@@ -76,19 +76,19 @@ function AuthPage() {
         </div>
         {sent ? (
           <div className="rounded-lg border bg-card p-6 text-center">
-            <h2 className="text-xl">Check your inbox 📬</h2>
+            <h2 className="text-xl">Check your inbox</h2>
             <p className="mt-2 text-sm text-muted-foreground">We sent a confirmation link to {email}. Click it and you're in.</p>
           </div>
         ) : (
           <div className="rounded-lg border bg-card p-6">
-            <button type="button" onClick={google} className="flex h-11 w-full items-center justify-center gap-[10px] rounded-full border border-[#747775] bg-[#FFFFFF] px-3 text-sm font-medium text-[#1F1F1F]">
+            <button type="button" onClick={google} className="flex h-11 w-full items-center justify-center gap-[10px] rounded-lg border border-[#747775] bg-[#FFFFFF] px-3 text-sm font-medium text-[#1F1F1F]">
               <GoogleLogo /> Continue with Google
             </button>
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
             <form onSubmit={submit} className="space-y-4">
               <div className="space-y-1.5"><Label htmlFor="email">Email</Label><Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 rounded-xl" /></div>
               <div className="space-y-1.5"><Label htmlFor="pw">Password</Label><Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 rounded-xl" /></div>
-              <Button type="submit" disabled={busy} className="h-11 w-full rounded-full">{mode === "signin" ? "Sign in" : "Create my account"}</Button>
+              <Button type="submit" disabled={busy} className="h-11 w-full rounded-lg">{mode === "signin" ? "Sign in" : "Create my account"}</Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               {mode === "signin" ? "New here?" : "Already have an account?"}{" "}

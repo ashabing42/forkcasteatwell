@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             const active = pathname.startsWith(t.to);
             return (
               <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
-                <span className={cn("rounded-full px-3 py-1 transition-colors", active && "bg-secondary")}>
+                <span className={cn("rounded-lg px-3 py-1 transition-colors", active && "bg-secondary")}>
                   <t.icon className="h-5 w-5" />
                 </span>
                 {t.label}

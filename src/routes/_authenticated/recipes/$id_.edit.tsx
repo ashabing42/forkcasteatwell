@@ -67,14 +67,14 @@ function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }
               <Button type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => set({ ingredients: r.ingredients.filter((_, j) => j !== i) })}><X className="h-4 w-4" /></Button>
             </div>
           ))}
-          <Button type="button" variant="secondary" size="sm" className="rounded-full" onClick={() => set({ ingredients: [...r.ingredients, { name: "", quantity: null, unit: "", category: "produce" }] })}><Plus className="mr-1 h-4 w-4" /> Ingredient</Button>
+          <Button type="button" variant="secondary" size="sm" className="rounded-lg" onClick={() => set({ ingredients: [...r.ingredients, { name: "", quantity: null, unit: "", category: "produce" }] })}><Plus className="mr-1 h-4 w-4" /> Ingredient</Button>
         </div>
       </section>
       <section>
         <h2 className="mb-2 text-lg">Steps</h2>
         <div className="space-y-2">
           {r.steps.map((s, i) => <Textarea key={i} rows={2} value={s} placeholder={`Step ${i + 1}`} onChange={(e) => set({ steps: r.steps.map((x, j) => (j === i ? e.target.value : x)) })} className="rounded-xl" />)}
-          <Button type="button" variant="secondary" size="sm" className="rounded-full" onClick={() => set({ steps: [...r.steps, ""] })}><Plus className="mr-1 h-4 w-4" /> Step</Button>
+          <Button type="button" variant="secondary" size="sm" className="rounded-lg" onClick={() => set({ steps: [...r.steps, ""] })}><Plus className="mr-1 h-4 w-4" /> Step</Button>
         </div>
       </section>
       <section>
@@ -94,14 +94,14 @@ function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }
               <Button type="button" size="icon" variant="ghost" aria-label="Remove" onClick={() => set({ prep_tasks: r.prep_tasks.filter((_, j) => j !== i) })}><X className="h-4 w-4" /></Button>
             </div>
           ))}
-          <Button type="button" variant="secondary" size="sm" className="rounded-full" onClick={() => set({ prep_tasks: [...r.prep_tasks, { title: "", hours_before: 2 }] })}><Plus className="mr-1 h-4 w-4" /> Reminder</Button>
+          <Button type="button" variant="secondary" size="sm" className="rounded-lg" onClick={() => set({ prep_tasks: [...r.prep_tasks, { title: "", hours_before: 2 }] })}><Plus className="mr-1 h-4 w-4" /> Reminder</Button>
         </div>
       </section>
-      <Button type="submit" size="lg" className="h-12 w-full rounded-full">Save recipe</Button>
+      <Button type="submit" size="lg" className="h-12 w-full rounded-lg">Save recipe</Button>
     </form>
   );
 }
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
-  return <button type="button" onClick={onClick} className={cn("rounded-full border px-4 py-2 text-sm", on ? "border-primary bg-primary text-primary-foreground" : "bg-card")}>{children}</button>;
+  return <button type="button" onClick={onClick} className={cn("rounded-lg border px-4 py-2 text-sm", on ? "border-primary bg-primary text-primary-foreground" : "bg-card")}>{children}</button>;
 }

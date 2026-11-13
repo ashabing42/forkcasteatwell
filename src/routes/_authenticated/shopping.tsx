@@ -40,8 +40,8 @@ function Shopping() {
         <WeekNav week={week} onChange={setWeek} />
       </div>
       <form className="mb-6 flex gap-2" onSubmit={async (e) => { e.preventDefault(); if (!name.trim()) return; await addCustomItem(week, name.trim(), "other"); setName(""); refresh(); }}>
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Add something else… (e.g. coffee)" className="h-11 rounded-full" />
-        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Add item"><Plus className="h-5 w-5" /></Button>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Add something else… (e.g. coffee)" className="h-11 rounded-lg" />
+        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-lg" aria-label="Add item"><Plus className="h-5 w-5" /></Button>
       </form>
       {lines.length === 0 && (custom.data ?? []).length === 0 && <p className="rounded-lg border border-dashed bg-card p-6 text-center text-muted-foreground">Your list fills itself once you plan the week.</p>}
       <div className="space-y-6">
@@ -55,14 +55,14 @@ function Shopping() {
               <ul className="divide-y rounded-lg border bg-card">
                 {items.map((l) => { const on = checked.includes(l.key); return (
                   <li key={l.key}><label className="flex items-center gap-3 px-4 py-3">
-                    <Checkbox checked={on} onCheckedChange={() => toggle(l.key)} className="h-5 w-5 rounded-full" />
+                    <Checkbox checked={on} onCheckedChange={() => toggle(l.key)} className="h-5 w-5 rounded-lg" />
                     <span className={on ? "flex-1 text-muted-foreground line-through" : "flex-1"}>{l.name}</span>
                     <span className="text-sm text-muted-foreground">{formatQty(l.quantity, l.unit)}</span>
                     <button type="button" aria-label={`I have ${l.name} at home`} title="I have this at home" className="p-1" onClick={(e) => { e.preventDefault(); haveIt(l.name, l.category); }}><Archive className="h-4 w-4 text-muted-foreground" /></button>
                   </label></li>); })}
                 {extras.map((c) => (
                   <li key={c.id} className="flex items-center gap-3 px-4 py-3">
-                    <Checkbox checked={c.checked} onCheckedChange={async (v) => { await toggleCustomItem(c.id, !!v); refresh(); }} className="h-5 w-5 rounded-full" />
+                    <Checkbox checked={c.checked} onCheckedChange={async (v) => { await toggleCustomItem(c.id, !!v); refresh(); }} className="h-5 w-5 rounded-lg" />
                     <span className={c.checked ? "flex-1 text-muted-foreground line-through" : "flex-1"}>{c.name}</span>
                     <button aria-label={`I have ${c.name} at home`} title="I have this at home" onClick={async () => { await haveIt(c.name, c.category); await deleteCustomItem(c.id); refresh(); }}><Archive className="h-4 w-4 text-muted-foreground" /></button>
                     <button aria-label="Remove" onClick={async () => { await deleteCustomItem(c.id); refresh(); }}><Trash2 className="h-4 w-4 text-muted-foreground" /></button>
@@ -80,7 +80,7 @@ function Shopping() {
           <ul className="divide-y rounded-lg border bg-secondary/40">
             {atHome.map((l) => (
               <li key={l.key} className="flex items-center gap-3 px-4 py-3">
-                <Checkbox checked disabled className="h-5 w-5 rounded-full" />
+                <Checkbox checked disabled className="h-5 w-5 rounded-lg" />
                 <span className="flex-1 text-muted-foreground line-through">{l.name}</span>
                 <span className="text-sm text-muted-foreground">{formatQty(l.quantity, l.unit)}</span>
               </li>

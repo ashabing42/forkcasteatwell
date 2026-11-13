@@ -31,7 +31,7 @@ function Settings() {
         <p className="mt-1 text-sm text-muted-foreground">Your private calendar of meals and prep reminders. Keep the link to yourself.</p>
         <div className="mt-4"><CalendarConnect token={profile.calendar_token} /></div>
       </section>
-      <Button variant="outline" className="w-full rounded-full" onClick={async () => { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sign out</Button>
+      <Button variant="outline" className="w-full rounded-lg" onClick={async () => { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sign out</Button>
     </div>
   );
 }

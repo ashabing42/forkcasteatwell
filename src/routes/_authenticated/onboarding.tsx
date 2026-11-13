@@ -29,7 +29,7 @@ function Onboarding() {
         <p className="mt-2 text-muted-foreground">Want your meals and prep reminders (like "thaw the chicken tonight") in your calendar? One tap and it stays up to date.</p>
       </div>
       <CalendarConnect token={profile.calendar_token} />
-      <Button variant="outline" size="lg" className="w-full rounded-full" onClick={() => navigate({ to: "/plan" })}>See my week</Button>
+      <Button variant="outline" size="lg" className="w-full rounded-lg" onClick={() => navigate({ to: "/plan" })}>See my week</Button>
     </div>
   );
   return (
