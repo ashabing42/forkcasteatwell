@@ -25,7 +25,7 @@ export const CATEGORY_LABEL: Record<string, string> = {
   protein: "Meat, fish & protein",
   dairy: "Dairy & eggs",
   bakery: "Bakery",
-  pantry: "Pantry",
+  pantry: "Cupboard & dry goods",
   spices: "Spices & condiments",
   frozen: "Frozen",
   other: "Other",
@@ -162,6 +162,34 @@ function roundQty(q: number): number {
   return Math.round(q * 100) / 100;
 }
 
+// Grams per cup for common dry/solid ingredients; liquids default to ml.
+const CUP_GRAMS: [RegExp, number][] = [
+  [/lentil|rice|quinoa|sugar|chickpea|bean|couscous|barley/, 190], [/oat/, 90], [/flour/, 125],
+  [/spinach|lettuce|kale|rocket|arugula|greens|cabbage|basil|parsley|cilantro|herb/, 30],
+  [/berr|tomato|pea|corn|edamame|cucumber|pepper|broccoli|mushroom/, 150], [/nut|walnut|almond|cashew|seed/, 120],
+  [/cheese|feta|parmesan/, 110], [/yogurt|yoghurt|hummus|peanut butter|tahini/, 245], [/olive/, 135],
+];
+const LIQUID = /(milk|stock|broth|water|juice|oil|vinegar|sauce|syrup|cream|wine)/;
+/** Convert an amount to metric: g / ml, keeping tsp/tbsp for small amounts. Never cups. */
+export function toMetric(name: string, quantity: number | null, unit: string): { quantity: number | null; unit: string } {
+  const u = normalizeUnit(unit);
+  const n = name.toLowerCase();
+  if (quantity == null) return { quantity, unit: u === "cup" ? "" : u };
+  switch (u) {
+    case "kg": return { quantity: quantity * 1000, unit: "g" };
+    case "l": return { quantity: quantity * 1000, unit: "ml" };
+    case "oz": return { quantity: Math.round(quantity * 28.35), unit: "g" };
+    case "lb": return { quantity: Math.round(quantity * 453.6), unit: "g" };
+    case "cup": {
+      if (LIQUID.test(n)) return { quantity: quantity * 240, unit: "ml" };
+      const g = CUP_GRAMS.find(([re]) => re.test(n))?.[1] ?? 150;
+      return { quantity: Math.round(quantity * g), unit: "g" };
+    }
+    default: return { quantity, unit: u };
+  }
+}
+const ML_PER = { tsp: 5, tbsp: 15, ml: 1 } as Record<string, number>;
+
 export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: number): ShoppingLine[] {
   const byId = new Map(recipes.map((r) => [r.id, r]));
   const acc = new Map<string, ShoppingLine>();
@@ -171,10 +199,14 @@ export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: nu
     const factor = servings / Math.max(1, r.servings || 1);
     for (const ing of r.ingredients) {
       if (!ing.name?.trim()) continue;
-      const unit = normalizeUnit(ing.unit);
-      const key = `${normalizeName(ing.name)}|${unit}`;
+      const m = toMetric(ing.name, ing.quantity == null ? null : ing.quantity * factor, ing.unit);
+      let unit = m.unit;
+      let q = m.quantity;
+      // Merge spoons and ml into one volume line.
+      if (unit in ML_PER) { q = q == null ? null : q * ML_PER[unit]!; unit = "ml"; }
+      const base = normalizeName(ing.name);
+      const key = `${base}|${unit}`;
       const prev = acc.get(key);
-      const q = ing.quantity == null ? null : ing.quantity * factor;
       if (prev) {
         prev.quantity = prev.quantity == null && q == null ? null : roundQty((prev.quantity ?? 0) + (q ?? 0));
       } else {
@@ -182,11 +214,19 @@ export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: nu
       }
     }
   }
+  // Small volumes read better as spoons.
+  for (const l of acc.values()) {
+    if (l.unit === "ml" && l.quantity != null && l.quantity < 45) {
+      if (l.quantity % 15 === 0) { l.quantity = l.quantity / 15; l.unit = "tbsp"; }
+      else { l.quantity = roundQty(l.quantity / 5); l.unit = "tsp"; }
+    }
+  }
   return [...acc.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function formatQty(q: number | null, unit: string): string {
   if (q == null) return unit;
+  if ((unit === "g" || unit === "ml") && q >= 50) q = Math.round(q / 5) * 5;
   const nice = Number.isInteger(q) ? String(q) : q < 10 ? String(Math.round(q * 4) / 4) : String(Math.round(q));
   return unit ? `${nice} ${unit}` : nice;
 }

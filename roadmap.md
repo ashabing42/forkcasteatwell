@@ -5,3 +5,4 @@
 - [x] Shopping list with exact scaled quantities, grouped, check-off, custom items
 - [x] Prep reminders, Today dashboard, .ics download + subscription feed
 - [ ] v2 (later): import recipes from links
+- [x] Metric units only (g/ml, tsp/tbsp for small amounts), merge same ingredient across units, rename "Pantry" aisle
