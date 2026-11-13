@@ -10,7 +10,7 @@ export const DIETS = [
 ] as const;
 export const DIET_TAGS = DIETS.filter((d) => d.id !== "balanced");
 
-export const MEALS = ["breakfast", "lunch", "dinner", "snack"] as const;
+export const MEALS = ["breakfast", "lunch", "dinner"] as const;
 export type Meal = (typeof MEALS)[number];
 export const MEAL_LABEL: Record<string, string> = {
   breakfast: "Breakfast",
