@@ -230,7 +230,44 @@ export type PrepEvent = {
   mealDate: string;
   due: Date;
   mealAt: Date;
+  /** "meal" events show the meal itself; default is a prep task. */
+  kind?: "prep" | "meal";
+  durationMin?: number;
+  description?: string;
 };
+
+/** One calendar event per planned meal, at the meal's time. */
+export function computeMealEvents(slots: Slot[], recipes: Recipe[], profile: Profile, servings?: number): PrepEvent[] {
+  const byId = new Map(recipes.map((r) => [r.id, r]));
+  const out: PrepEvent[] = [];
+  for (const s of slots) {
+    const r = s.recipe_id ? byId.get(s.recipe_id) : undefined;
+    if (!r) continue;
+    const mealAt = zonedToUtc(s.date, mealTime(profile, s.meal), profile.timezone || "UTC");
+    const label = MEAL_LABEL[s.meal] ?? s.meal;
+    const time = (Number(r.prep_minutes) || 0) + (Number(r.cook_minutes) || 0);
+    out.push({
+      id: `meal-${s.date}-${s.meal}`,
+      title: `${label}: ${r.title}`,
+      recipeTitle: r.title,
+      recipeId: r.id,
+      meal: s.meal,
+      mealDate: s.date,
+      due: mealAt,
+      mealAt,
+      kind: "meal",
+      durationMin: 45,
+      description: [`${label}: ${r.title}`, servings ? `Serves ${servings}` : "", time ? `Ready in about ${time} min` : "",
+        r.ingredients.length ? `You'll need: ${r.ingredients.slice(0, 8).map((i) => i.name).join(", ")}` : ""].filter(Boolean).join("\n"),
+    });
+  }
+  return out.sort((a, b) => a.due.getTime() - b.due.getTime());
+}
+
+/** Opens Google Calendar's "add this calendar" screen for a feed URL. */
+export function googleCalendarSubscribeUrl(feedUrl: string): string {
+  return `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(feedUrl.replace(/^https?:/, "webcal:"))}`;
+}
 
 export function computePrepEvents(slots: Slot[], recipes: Recipe[], profile: Profile): PrepEvent[] {
   const byId = new Map(recipes.map((r) => [r.id, r]));
@@ -262,23 +299,25 @@ function icsDate(d: Date): string {
 function icsEscape(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 }
-export function buildIcs(events: PrepEvent[], calName = "MealMap prep reminders"): string {
+export function buildIcs(events: PrepEvent[], calName = "MealMap"): string {
   const now = icsDate(new Date());
   const lines = [
     "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MealMap//Prep reminders//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
     `X-WR-CALNAME:${icsEscape(calName)}`, "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H",
   ];
   for (const e of events) {
-    const end = new Date(e.due.getTime() + 15 * 60_000);
+    const end = new Date(e.due.getTime() + (e.durationMin ?? 15) * 60_000);
+    const summary = e.kind === "meal" ? e.title : `${e.title} — ${e.recipeTitle}`;
+    const desc = e.description ?? `Prep for ${MEAL_LABEL[e.meal] ?? e.meal} on ${e.mealDate}: ${e.recipeTitle}`;
     lines.push(
       "BEGIN:VEVENT",
       `UID:${e.id}@mealmap`,
       `DTSTAMP:${now}`,
       `DTSTART:${icsDate(e.due)}`,
       `DTEND:${icsDate(end)}`,
-      `SUMMARY:${icsEscape(`${e.title} — ${e.recipeTitle}`)}`,
-      `DESCRIPTION:${icsEscape(`Prep for ${MEAL_LABEL[e.meal] ?? e.meal} on ${e.mealDate}: ${e.recipeTitle}`)}`,
-      "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsEscape(e.title)}`, "TRIGGER:-PT0M", "END:VALARM",
+      `SUMMARY:${icsEscape(summary)}`,
+      `DESCRIPTION:${icsEscape(desc)}`,
+      "BEGIN:VALARM", "ACTION:DISPLAY", `DESCRIPTION:${icsEscape(e.title)}`, e.kind === "meal" ? "TRIGGER:-PT30M" : "TRIGGER:-PT0M", "END:VALARM",
       "END:VEVENT",
     );
   }
