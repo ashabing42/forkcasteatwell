@@ -58,7 +58,7 @@ describe("calendar feed", () => {
     const recipe = { id: "r1", title: "Shakshuka", prep_minutes: 10, cook_minutes: 20, ingredients: [], prep_tasks: [] } as never;
     const ev = _cme([{ date: "2026-11-16", meal: "dinner", recipe_id: "r1", locked: false } as never, { date: "2026-11-16", meal: "lunch", recipe_id: null, locked: false } as never], [recipe], profile);
     expect(ev).toHaveLength(1);
-    expect(ev[0].due.toISOString()).toBe("2026-11-16T21:00:00.000Z");
+    expect(ev[0]!.due.toISOString()).toBe("2026-11-16T21:00:00.000Z");
     expect(_bi(ev)).toContain("SUMMARY:Dinner: Shakshuka");
   });
 });
