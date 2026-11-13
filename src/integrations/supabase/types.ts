@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           checked_keys: string[]
           id: string
+          settings: Json | null
           slots: Json
           updated_at: string
           user_id: string
@@ -26,6 +27,7 @@ export type Database = {
         Insert: {
           checked_keys?: string[]
           id?: string
+          settings?: Json | null
           slots?: Json
           updated_at?: string
           user_id?: string
@@ -34,6 +36,7 @@ export type Database = {
         Update: {
           checked_keys?: string[]
           id?: string
+          settings?: Json | null
           slots?: Json
           updated_at?: string
           user_id?: string

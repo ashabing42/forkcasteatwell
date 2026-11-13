@@ -17,20 +17,20 @@ export const Route = createFileRoute("/_authenticated/shopping")({
 
 function Shopping() {
   const [week, setWeek] = useState(weekStartOf(new Date()));
-  const { profile, slots, checked } = usePlan(week);
+  const { settings, slots, checked } = usePlan(week);
   const recipes = useRecipes().data ?? [];
   const save = useSavePlan(week);
   const qc = useQueryClient();
   const custom = useQuery({ queryKey: qk.custom(week), queryFn: () => fetchCustomItems(week) });
   const [name, setName] = useState("");
-  const lines = buildShoppingList(slots, recipes, profile.data?.servings ?? 2);
+  const lines = buildShoppingList(slots, recipes, settings?.servings ?? 2);
   const refresh = () => qc.invalidateQueries({ queryKey: qk.custom(week) });
   const toggle = (key: string) => save.mutate({ slots, checked_keys: checked.includes(key) ? checked.filter((k) => k !== key) : [...checked, key] });
 
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div><h1 className="text-3xl">Shopping list</h1><p className="text-sm text-muted-foreground">For {profile.data?.servings ?? "…"} people · {lines.length} items</p></div>
+        <div><h1 className="text-3xl">Shopping list</h1><p className="text-sm text-muted-foreground">For {settings?.servings ?? "…"} people · {lines.length} items</p></div>
         <WeekNav week={week} onChange={setWeek} />
       </div>
       <form className="mb-6 flex gap-2" onSubmit={async (e) => { e.preventDefault(); if (!name.trim()) return; await addCustomItem(week, name.trim(), "other"); setName(""); refresh(); }}>
