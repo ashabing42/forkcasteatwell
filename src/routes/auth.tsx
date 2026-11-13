@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — MealMap" },
-      { name: "description", content: "Sign in to MealMap to plan your healthy week." },
-      { property: "og:title", content: "Sign in — MealMap" },
-      { property: "og:description", content: "Sign in to MealMap to plan your healthy week." },
+      { title: "Sign in — Forkcast" },
+      { name: "description", content: "Sign in to Forkcast to plan your healthy week." },
+      { property: "og:title", content: "Sign in — Forkcast" },
+      { property: "og:description", content: "Sign in to Forkcast to plan your healthy week." },
     ],
   }),
   component: AuthPage,
@@ -70,17 +70,17 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary text-primary"><Leaf className="h-7 w-7" /></div>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-secondary text-primary"><Leaf className="h-7 w-7" /></div>
           <h1 className="text-3xl">{mode === "signin" ? "Welcome back" : "Let's get you planning"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">Your healthy week, sorted in a minute.</p>
         </div>
         {sent ? (
-          <div className="rounded-2xl border bg-card p-6 text-center shadow-soft">
+          <div className="rounded-lg border bg-card p-6 text-center">
             <h2 className="text-xl">Check your inbox 📬</h2>
             <p className="mt-2 text-sm text-muted-foreground">We sent a confirmation link to {email}. Click it and you're in.</p>
           </div>
         ) : (
-          <div className="rounded-2xl border bg-card p-6 shadow-soft">
+          <div className="rounded-lg border bg-card p-6">
             <button type="button" onClick={google} className="flex h-11 w-full items-center justify-center gap-[10px] rounded-full border border-[#747775] bg-[#FFFFFF] px-3 text-sm font-medium text-[#1F1F1F]">
               <GoogleLogo /> Continue with Google
             </button>

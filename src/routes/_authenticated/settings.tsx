@@ -9,7 +9,7 @@ import { qk, saveProfile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — MealMap" }, { name: "description", content: "Diet, servings and reminder settings." }] }),
+  head: () => ({ meta: [{ title: "Settings — Forkcast" }, { name: "description", content: "Diet, servings and reminder settings." }] }),
   component: Settings,
 });
 
@@ -26,7 +26,7 @@ function Settings() {
         await qc.invalidateQueries({ queryKey: qk.profile });
         toast.success("Saved! Your next plan will use these.");
       }} />
-      <section className="rounded-2xl border bg-card p-5">
+      <section className="rounded-lg border bg-card p-5">
         <h2 className="text-xl">Calendar subscription</h2>
         <p className="mt-1 text-sm text-muted-foreground">Your private calendar of meals and prep reminders. Keep the link to yourself.</p>
         <div className="mt-4"><CalendarConnect token={profile.calendar_token} /></div>

@@ -83,10 +83,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MealMap — your healthy week, planned" },
-      { name: "description", content: "MealMap plans your week of diet-friendly meals, builds the shopping list and reminds you about prep." },
+      { title: "Forkcast — your healthy week, planned" },
+      { name: "description", content: "Forkcast plans your week of diet-friendly meals, builds the shopping list and reminds you about prep." },
       { name: "theme-color", content: "#5a9f72" },
-      { property: "og:title", content: "MealMap — your healthy week, planned" },
+      { property: "og:title", content: "Forkcast — your healthy week, planned" },
       { property: "og:description", content: "Weekly meal plans, shopping lists and prep reminders for your diet." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

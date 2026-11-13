@@ -11,7 +11,7 @@ import { fetchRecipes, qk, savePlan, saveProfile, seedRecipesIfEmpty } from "@/l
 import { buildEmptySlots, generatePlan, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
-  head: () => ({ meta: [{ title: "Welcome — MealMap" }, { name: "description", content: "Set up your MealMap diet and plan." }] }),
+  head: () => ({ meta: [{ title: "Welcome — Forkcast" }, { name: "description", content: "Set up your Forkcast diet and plan." }] }),
   component: Onboarding,
 });
 
@@ -25,7 +25,7 @@ function Onboarding() {
     <div className="space-y-6">
       <div>
         <Leaf className="h-8 w-8 text-primary" />
-        <h1 className="mt-3 text-3xl">Your week is ready 🎉</h1>
+        <h1 className="mt-3 text-3xl">Your week is ready</h1>
         <p className="mt-2 text-muted-foreground">Want your meals and prep reminders (like "thaw the chicken tonight") in your calendar? One tap and it stays up to date.</p>
       </div>
       <CalendarConnect token={profile.calendar_token} />

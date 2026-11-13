@@ -38,7 +38,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-24 md:pb-0 md:pl-56">
       <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r bg-card px-4 py-6 md:flex">
         <Link to="/today" className="mb-8 flex items-center gap-2 px-2 font-display text-2xl text-primary">
-          <Leaf className="h-6 w-6" /> MealMap
+          <Leaf className="h-6 w-6" /> Forkcast
         </Link>
         <nav className="flex flex-col gap-1">
           {TABS.map((t) => (

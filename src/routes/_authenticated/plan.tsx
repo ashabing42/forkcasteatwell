@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/plan")({
   validateSearch: z.object({ week: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional() }),
-  head: () => ({ meta: [{ title: "Weekly plan — MealMap" }, { name: "description", content: "Your week of meals, matched to your diet." }] }),
+  head: () => ({ meta: [{ title: "Weekly plan — Forkcast" }, { name: "description", content: "Your week of meals, matched to your diet." }] }),
   component: PlanPage,
 });
 
@@ -48,7 +48,7 @@ function PlanPage() {
       return;
     }
     update(next);
-    toast.success(hasAny ? "Fresh picks for everything you didn't lock!" : "Your week is ready 🎉");
+    toast.success(hasAny ? "Fresh picks for everything you didn't lock!" : "Your week is ready");
   }
 
   const days = [...new Set(slots.map((s) => s.date))];
@@ -97,8 +97,8 @@ function PlanPage() {
   return (
     <div>
       <Dialog open={askCalendar} onOpenChange={setAskCalendar}>
-        <DialogContent className="rounded-3xl">
-          <DialogHeader><DialogTitle>Your week is ready 🎉</DialogTitle></DialogHeader>
+        <DialogContent className="rounded-xl">
+          <DialogHeader><DialogTitle>Your week is ready</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Put this week's meals and prep reminders in your calendar. Already added it? You're all set, it updates by itself.</p>
           {profile.data && <CalendarConnect token={profile.data.calendar_token} compact />}
           <Button variant="outline" className="rounded-full" onClick={() => setAskCalendar(false)}>Maybe later</Button>
@@ -134,7 +134,7 @@ function PlanPage() {
               {slots.filter((s) => s.date === date).map((slot) => {
                 const r = slot.recipe_id ? byId.get(slot.recipe_id) : undefined;
                 return (
-                  <div key={slot.meal} className={cn("overflow-hidden rounded-2xl border bg-card shadow-soft", slot.locked && "ring-2 ring-primary")}>
+                  <div key={slot.meal} className={cn("overflow-hidden rounded-lg border bg-card", slot.locked && "ring-2 ring-primary")}>
                     {r ? (
                       <Link to="/recipes/$id" params={{ id: r.id }} className="block">
                         <img src={r.image_url ?? ""} alt="" className="aspect-[16/10] w-full bg-muted object-cover" loading="lazy" />
@@ -188,7 +188,7 @@ function SwapDialog({ slot, recipes, diets, onClose, onPick, onSurprise }: { slo
     .filter((r) => r.title.toLowerCase().includes(q.toLowerCase()));
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[85vh] overflow-hidden rounded-3xl p-0 sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] overflow-hidden rounded-xl p-0 sm:max-w-lg">
         <DialogHeader className="px-5 pt-5"><DialogTitle className="font-display text-xl">Swap {(MEAL_LABEL[slot.meal] ?? "meal").toLowerCase()}</DialogTitle></DialogHeader>
         <div className="space-y-3 px-5">
           <Button onClick={onSurprise} className="w-full rounded-full"><Shuffle className="mr-2 h-4 w-4" /> Surprise me</Button>
@@ -197,7 +197,7 @@ function SwapDialog({ slot, recipes, diets, onClose, onPick, onSurprise }: { slo
         </div>
         <div className="max-h-[45vh] space-y-2 overflow-y-auto px-5 pb-5">
           {options.map((r) => (
-            <button key={r.id} onClick={() => onPick(r.id)} className={cn("flex w-full items-center gap-3 rounded-2xl border p-2 text-left hover:border-primary", r.id === slot.recipe_id && "border-primary bg-secondary")}>
+            <button key={r.id} onClick={() => onPick(r.id)} className={cn("flex w-full items-center gap-3 rounded-lg border p-2 text-left hover:border-primary", r.id === slot.recipe_id && "border-primary bg-secondary")}>
               <img src={r.image_url ?? ""} alt="" className="h-14 w-14 rounded-xl bg-muted object-cover" />
               <span className="flex-1 text-sm font-medium">{r.title}</span>
             </button>

@@ -10,7 +10,7 @@ export type ProfileDraft = Pick<ProfileRow, "diets" | "meals" | "days" | "servin
 
 function Stepper({ value, onChange, min, max, label }: { value: number; onChange: (n: number) => void; min: number; max: number; label: string }) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border bg-card p-4">
+    <div className="flex items-center justify-between rounded-lg border bg-card p-4">
       <span className="font-medium">{label}</span>
       <div className="flex items-center gap-3">
         <Button type="button" size="icon" variant="secondary" className="rounded-full" aria-label={`Fewer ${label}`} onClick={() => onChange(Math.max(min, value - 1))}><Minus className="h-4 w-4" /></Button>
@@ -52,7 +52,7 @@ export function ProfileForm({ initial, submitLabel, onSubmit, showTimes }: { ini
             const on = d.diets.includes(diet.id);
             return (
               <button type="button" key={diet.id} onClick={() => toggleDiet(diet.id)} aria-pressed={on}
-                className={cn("flex items-center gap-2 rounded-2xl border p-3 text-left text-sm font-medium transition-all", on ? "border-primary bg-secondary text-secondary-foreground" : "bg-card hover:border-primary/40", diet.id === "balanced" && "col-span-2")}>
+                className={cn("flex items-center gap-2 rounded-lg border p-3 text-left text-sm font-medium transition-all", on ? "border-primary bg-secondary text-secondary-foreground" : "bg-card hover:border-primary/40", diet.id === "balanced" && "col-span-2")}>
                 <span className="text-lg">{diet.emoji}</span><span className="flex-1">{diet.label}</span>{on && <Check className="h-4 w-4 text-primary" />}
               </button>
             );

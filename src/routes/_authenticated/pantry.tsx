@@ -10,7 +10,7 @@ import { guessCategory, weekStartOf } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pantry")({
-  head: () => ({ meta: [{ title: "Pantry & freezer — MealMap" }, { name: "description", content: "Keep track of what you already have at home." }] }),
+  head: () => ({ meta: [{ title: "Pantry & freezer — Forkcast" }, { name: "description", content: "Keep track of what you already have at home." }] }),
   component: Pantry,
 });
 
@@ -41,9 +41,9 @@ function Pantry() {
         <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Add"><Plus className="h-5 w-5" /></Button>
       </form>
       {items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed bg-card p-6 text-center text-muted-foreground">Nothing here yet. Add what you have, or tap "I have this" on your shopping list. 🫙</p>
+        <p className="rounded-lg border border-dashed bg-card p-6 text-center text-muted-foreground">Nothing here yet. Add what you have, or tap "I have this" on your shopping list.</p>
       ) : (
-        <ul className="divide-y rounded-2xl border bg-card">
+        <ul className="divide-y rounded-lg border bg-card">
           {items.map((i) => (
             <li key={i.id} className="flex items-center gap-2 px-4 py-3">
               <span className="flex-1">{i.name}</span>

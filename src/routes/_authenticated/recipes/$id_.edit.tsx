@@ -12,7 +12,7 @@ import { CATEGORIES, CATEGORY_LABEL, DIET_TAGS, MEALS, MEAL_LABEL, guessCategory
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id_/edit")({
-  head: () => ({ meta: [{ title: "Edit recipe — MealMap" }, { name: "description", content: "Add or edit a recipe." }] }),
+  head: () => ({ meta: [{ title: "Edit recipe — Forkcast" }, { name: "description", content: "Add or edit a recipe." }] }),
   component: EditPage,
 });
 

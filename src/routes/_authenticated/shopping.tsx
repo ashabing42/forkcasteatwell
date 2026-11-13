@@ -11,7 +11,7 @@ import { addCustomItem, addPantryItem, deleteCustomItem, fetchCustomItems, fetch
 import { buildShoppingList, splitByPantry, CATEGORIES, CATEGORY_LABEL, formatQty, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/shopping")({
-  head: () => ({ meta: [{ title: "Shopping list — MealMap" }, { name: "description", content: "Your week's groceries, grouped by aisle." }] }),
+  head: () => ({ meta: [{ title: "Shopping list — Forkcast" }, { name: "description", content: "Your week's groceries, grouped by aisle." }] }),
   component: Shopping,
 });
 
@@ -43,7 +43,7 @@ function Shopping() {
         <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Add something else… (e.g. coffee)" className="h-11 rounded-full" />
         <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Add item"><Plus className="h-5 w-5" /></Button>
       </form>
-      {lines.length === 0 && (custom.data ?? []).length === 0 && <p className="rounded-2xl border border-dashed bg-card p-6 text-center text-muted-foreground">Your list fills itself once you plan the week. 🛒</p>}
+      {lines.length === 0 && (custom.data ?? []).length === 0 && <p className="rounded-lg border border-dashed bg-card p-6 text-center text-muted-foreground">Your list fills itself once you plan the week.</p>}
       <div className="space-y-6">
         {CATEGORIES.map((cat) => {
           const items = lines.filter((l) => l.category === cat);
@@ -52,7 +52,7 @@ function Shopping() {
           return (
             <section key={cat}>
               <h2 className="mb-2 text-lg">{CATEGORY_LABEL[cat]}</h2>
-              <ul className="divide-y rounded-2xl border bg-card">
+              <ul className="divide-y rounded-lg border bg-card">
                 {items.map((l) => { const on = checked.includes(l.key); return (
                   <li key={l.key}><label className="flex items-center gap-3 px-4 py-3">
                     <Checkbox checked={on} onCheckedChange={() => toggle(l.key)} className="h-5 w-5 rounded-full" />
@@ -77,7 +77,7 @@ function Shopping() {
         <section className="mt-8">
           <h2 className="mb-1 text-lg">Already at home</h2>
           <p className="mb-2 text-sm text-muted-foreground">No need to buy these. Ran out? Remove them from the Pantry page.</p>
-          <ul className="divide-y rounded-2xl border bg-secondary/40">
+          <ul className="divide-y rounded-lg border bg-secondary/40">
             {atHome.map((l) => (
               <li key={l.key} className="flex items-center gap-3 px-4 py-3">
                 <Checkbox checked disabled className="h-5 w-5 rounded-full" />
