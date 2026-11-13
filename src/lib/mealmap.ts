@@ -226,6 +226,7 @@ export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: nu
 
 export function formatQty(q: number | null, unit: string): string {
   if (q == null) return unit;
+  if ((unit === "g" || unit === "ml") && q >= 50) q = Math.round(q / 5) * 5;
   const nice = Number.isInteger(q) ? String(q) : q < 10 ? String(Math.round(q * 4) / 4) : String(Math.round(q));
   return unit ? `${nice} ${unit}` : nice;
 }

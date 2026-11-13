@@ -62,3 +62,20 @@ describe("calendar feed", () => {
     expect(_bi(ev)).toContain("SUMMARY:Dinner: Shakshuka");
   });
 });
+
+import { buildShoppingList as _bsl, toMetric as _tm } from "@/lib/mealmap";
+describe("metric shopping list", () => {
+  it("never uses cups and merges red lentils across cups and grams", () => {
+    const recipes = [
+      { id: "a", servings: 2, ingredients: [{ name: "red lentils", quantity: 1, unit: "cup", category: "pantry" }] },
+      { id: "b", servings: 2, ingredients: [{ name: "red lentils", quantity: 150, unit: "g", category: "pantry" }] },
+    ] as never;
+    const list = _bsl([{ recipe_id: "a" }, { recipe_id: "b" }] as never, recipes, 2);
+    expect(list).toHaveLength(1);
+    expect(list[0]).toMatchObject({ unit: "g", quantity: 340 });
+  });
+  it("converts litres to ml and liquid cups to ml", () => {
+    expect(_tm("vegetable stock", 1.5, "l")).toEqual({ quantity: 1500, unit: "ml" });
+    expect(_tm("oat milk", 1, "cup")).toEqual({ quantity: 240, unit: "ml" });
+  });
+});

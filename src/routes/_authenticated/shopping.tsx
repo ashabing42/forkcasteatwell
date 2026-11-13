@@ -75,7 +75,7 @@ function Shopping() {
       </div>
       {atHome.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-1 text-lg">Already in your pantry</h2>
+          <h2 className="mb-1 text-lg">Already at home</h2>
           <p className="mb-2 text-sm text-muted-foreground">No need to buy these. Ran out? Remove them from the Pantry page.</p>
           <ul className="divide-y rounded-2xl border bg-secondary/40">
             {atHome.map((l) => (

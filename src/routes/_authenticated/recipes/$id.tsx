@@ -4,7 +4,7 @@ import { Clock, Pencil, Trash2, Users, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecipes } from "@/hooks/use-mealmap";
 import { deleteRecipe, qk } from "@/lib/api";
-import { DIETS, formatQty } from "@/lib/mealmap";
+import { DIETS, formatQty, toMetric } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id")({
   head: () => ({ meta: [{ title: "Recipe — MealMap" }, { name: "description", content: "Recipe details." }] }),
@@ -33,7 +33,7 @@ function RecipeView() {
         <div className="rounded-2xl bg-accent p-4 text-sm">{r.prep_tasks.map((t, i) => <p key={i} className="flex items-center gap-2"><Bell className="h-4 w-4" /> {t.title}: {t.hours_before}h before</p>)}</div>
       )}
       <section><h2 className="mb-2 text-xl">Ingredients</h2>
-        <ul className="divide-y rounded-2xl border bg-card">{r.ingredients.map((g, i) => <li key={i} className="flex justify-between px-4 py-2.5"><span>{g.name}</span><span className="text-muted-foreground">{formatQty(g.quantity, g.unit)}</span></li>)}</ul></section>
+        <ul className="divide-y rounded-2xl border bg-card">{r.ingredients.map((g, i) => <li key={i} className="flex justify-between px-4 py-2.5"><span>{g.name}</span><span className="text-muted-foreground">{(() => { const m = toMetric(g.name, g.quantity, g.unit); return formatQty(m.quantity, m.unit); })()}</span></li>)}</ul></section>
       <section><h2 className="mb-2 text-xl">Steps</h2>
         <ol className="space-y-3">{r.steps.map((s, i) => <li key={i} className="flex gap-3"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-sm text-primary-foreground">{i + 1}</span><p className="pt-0.5">{s}</p></li>)}</ol></section>
       <div className="flex gap-2">
