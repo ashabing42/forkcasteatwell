@@ -339,10 +339,10 @@ function icsDate(d: Date): string {
 function icsEscape(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 }
-export function buildIcs(events: PrepEvent[], calName = "MealMap"): string {
+export function buildIcs(events: PrepEvent[], calName = "Forkcast"): string {
   const now = icsDate(new Date());
   const lines = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//MealMap//Prep reminders//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Forkcast//Prep reminders//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
     `X-WR-CALNAME:${icsEscape(calName)}`, "REFRESH-INTERVAL;VALUE=DURATION:PT1H", "X-PUBLISHED-TTL:PT1H",
   ];
   for (const e of events) {
