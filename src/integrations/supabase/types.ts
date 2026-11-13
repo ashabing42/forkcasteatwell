@@ -14,7 +14,162 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      meal_plans: {
+        Row: {
+          checked_keys: string[]
+          id: string
+          slots: Json
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          checked_keys?: string[]
+          id?: string
+          slots?: Json
+          updated_at?: string
+          user_id?: string
+          week_start: string
+        }
+        Update: {
+          checked_keys?: string[]
+          id?: string
+          slots?: Json
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          breakfast_time: string
+          calendar_token: string
+          created_at: string
+          days: number
+          diets: string[]
+          dinner_time: string
+          id: string
+          lunch_time: string
+          meals: string[]
+          onboarded: boolean
+          servings: number
+          snack_time: string
+          timezone: string
+        }
+        Insert: {
+          breakfast_time?: string
+          calendar_token?: string
+          created_at?: string
+          days?: number
+          diets?: string[]
+          dinner_time?: string
+          id: string
+          lunch_time?: string
+          meals?: string[]
+          onboarded?: boolean
+          servings?: number
+          snack_time?: string
+          timezone?: string
+        }
+        Update: {
+          breakfast_time?: string
+          calendar_token?: string
+          created_at?: string
+          days?: number
+          diets?: string[]
+          dinner_time?: string
+          id?: string
+          lunch_time?: string
+          meals?: string[]
+          onboarded?: boolean
+          servings?: number
+          snack_time?: string
+          timezone?: string
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          cook_minutes: number
+          created_at: string
+          diet_tags: string[]
+          id: string
+          image_url: string | null
+          ingredients: Json
+          meal_types: string[]
+          prep_minutes: number
+          prep_tasks: Json
+          servings: number
+          source_url: string | null
+          steps: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          cook_minutes?: number
+          created_at?: string
+          diet_tags?: string[]
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          meal_types?: string[]
+          prep_minutes?: number
+          prep_tasks?: Json
+          servings?: number
+          source_url?: string | null
+          steps?: Json
+          title: string
+          user_id?: string
+        }
+        Update: {
+          cook_minutes?: number
+          created_at?: string
+          diet_tags?: string[]
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          meal_types?: string[]
+          prep_minutes?: number
+          prep_tasks?: Json
+          servings?: number
+          source_url?: string | null
+          steps?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      shopping_items: {
+        Row: {
+          category: string
+          checked: boolean
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          category?: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          user_id?: string
+          week_start: string
+        }
+        Update: {
+          category?: string
+          checked?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
