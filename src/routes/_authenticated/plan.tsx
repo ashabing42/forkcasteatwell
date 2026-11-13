@@ -1,6 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Lock, LockOpen, RefreshCw, Shuffle, Sparkles, X, Clock } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Lock, LockOpen, RefreshCw, Shuffle, Sparkles, X, Clock, Repeat, SlidersHorizontal } from "lucide-react";
+import { ProfileForm } from "@/components/ProfileForm";
+import { fetchPreviousSettings, qk, type WeekSettings } from "@/lib/api";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { WeekNav } from "@/components/WeekNav";
 import { usePlan, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
-import { generatePlan, matchesDiet, matchesMeal, MEAL_LABEL, parseISODate, surpriseFor, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
+import { buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, MEAL_LABEL, parseISODate, surpriseFor, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/plan")({
@@ -21,14 +24,16 @@ function PlanPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/plan" });
   const week = search.week ?? weekStartOf(new Date());
-  const { profile, slots, exists } = usePlan(week);
+  const { profile, slots, settings, hasWeekSettings } = usePlan(week);
+  const prev = useQuery({ queryKey: qk.prevSettings(week), queryFn: () => fetchPreviousSettings(week) });
+  const [editing, setEditing] = useState(false);
   const recipes = useRecipes();
   const save = useSavePlan(week);
   const [swapping, setSwapping] = useState<Slot | null>(null);
 
   const list = recipes.data ?? [];
   const byId = new Map(list.map((r) => [r.id, r]));
-  const diets = profile.data?.diets ?? [];
+  const diets = settings?.diets ?? [];
   const hasAny = slots.some((s) => s.recipe_id);
 
   const update = (next: Slot[]) => save.mutate({ slots: next });
@@ -46,6 +51,47 @@ function PlanPage() {
 
   const days = [...new Set(slots.map((s) => s.date))];
 
+  /** Save this week's answers and fill the week straight away (locked meals are kept). */
+  function planWeek(s: WeekSettings) {
+    const base = hasAny ? reconcileSlots(week, s, slots) : buildEmptySlots(week, s);
+    const next = generatePlan(base, list, s.diets);
+    save.mutate({ settings: s, slots: next });
+    setEditing(false);
+    if (next.every((x) => !x.recipe_id)) toast("No recipes match that diet yet — add a few in Recipes and try again.");
+    else toast.success("Your week is ready 🎉");
+  }
+
+  const showSetup = editing || (!hasWeekSettings && !hasAny);
+  if (showSetup) {
+    const p = profile.data;
+    const start = prev.data ?? settings;
+    if (!p || !start || prev.isLoading || recipes.isLoading) return null;
+    return (
+      <div>
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-3xl">Plan this week</h1>
+            <p className="text-sm text-muted-foreground">A few quick answers and we'll fill your week.</p>
+          </div>
+          <WeekNav week={week} onChange={(w) => { setEditing(false); navigate({ search: { week: w } }); }} />
+        </div>
+        {prev.data && !editing && (
+          <Button size="lg" onClick={() => planWeek(prev.data!)} className="mb-8 h-12 w-full rounded-full text-base">
+            <Repeat className="mr-2 h-5 w-5" /> Same as last week
+          </Button>
+        )}
+        {prev.data && !editing && <p className="mb-6 text-center text-sm text-muted-foreground">…or change anything below</p>}
+        <ProfileForm
+          key={week + String(editing)}
+          initial={{ ...p, ...start }}
+          submitLabel={editing ? "Update my week" : "Plan my week"}
+          onSubmit={(d) => planWeek({ diets: d.diets, servings: d.servings, days: d.days, meals: d.meals })}
+        />
+        {editing && <Button variant="ghost" className="mt-3 w-full rounded-full" onClick={() => setEditing(false)}>Cancel</Button>}
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -56,15 +102,19 @@ function PlanPage() {
         <WeekNav week={week} onChange={(w) => navigate({ search: { week: w } })} />
       </div>
 
-      <Button size="lg" onClick={generate} disabled={!profile.data || recipes.isLoading} className="mb-6 h-12 w-full rounded-full text-base sm:w-auto sm:px-8">
-        {hasAny ? <><RefreshCw className="mr-2 h-5 w-5" /> Regenerate unlocked meals</> : <><Sparkles className="mr-2 h-5 w-5" /> Generate my week</>}
-      </Button>
-
-      {!exists && !hasAny && (
-        <div className="mb-6 rounded-2xl border border-dashed bg-card p-6 text-center text-muted-foreground">
-          Nothing planned for this week yet. Tap <span className="font-medium text-foreground">Generate my week</span> and we'll do the thinking.
-        </div>
+      {settings && (
+        <p className="mb-3 text-sm text-muted-foreground">
+          {settings.servings} {settings.servings === 1 ? "person" : "people"} · {settings.days} {settings.days === 1 ? "day" : "days"} · {settings.diets.join(", ")}
+        </p>
       )}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Button size="lg" onClick={generate} disabled={!profile.data || recipes.isLoading} className="h-12 flex-1 rounded-full text-base sm:flex-none sm:px-8">
+          {hasAny ? <><RefreshCw className="mr-2 h-5 w-5" /> Regenerate unlocked meals</> : <><Sparkles className="mr-2 h-5 w-5" /> Fill my week</>}
+        </Button>
+        <Button size="lg" variant="secondary" onClick={() => setEditing(true)} className="h-12 rounded-full">
+          <SlidersHorizontal className="mr-2 h-5 w-5" /> Change this week
+        </Button>
+      </div>
 
       <div className="space-y-6">
         {days.map((date) => (
