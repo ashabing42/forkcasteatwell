@@ -1,16 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Plus, ShoppingCart, Trash2 } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/Doodle";
 import { Input } from "@/components/ui/input";
 import { addCustomItem, addPantryItem, deletePantryItem, fetchPantry, qk } from "@/lib/api";
 import { guessCategory, weekStartOf } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pantry")({
-  head: () => ({ meta: [{ title: "Pantry & freezer — MealMap" }, { name: "description", content: "Keep track of what you already have at home." }] }),
+  head: () => ({ meta: [{ title: "Pantry & freezer — Forkcast" }, { name: "description", content: "Keep track of what you already have at home." }] }),
   component: Pantry,
 });
 
@@ -29,25 +30,25 @@ function Pantry() {
     <div>
       <h1 className="text-3xl">Pantry & freezer</h1>
       <p className="mb-5 text-sm text-muted-foreground">Things you have at home won't land on your shopping list.</p>
-      <div className="mb-5 inline-flex rounded-full bg-secondary p-1">
+      <div className="mb-5 inline-flex rounded-lg bg-secondary p-1">
         {LOCS.map((l) => (
-          <button key={l.id} onClick={() => setLoc(l.id)} className={cn("rounded-full px-5 py-1.5 text-sm font-medium", loc === l.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}>
+          <button key={l.id} onClick={() => setLoc(l.id)} className={cn("rounded-lg px-5 py-1.5 text-sm font-medium", loc === l.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}>
             {l.label} ({data.filter((i) => i.location === l.id).length})
           </button>
         ))}
       </div>
       <form className="mb-6 flex gap-2" onSubmit={async (e) => { e.preventDefault(); if (!name.trim()) return; await addPantryItem(name.trim(), loc); setName(""); refresh(); }}>
-        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={loc === "pantry" ? "Add to pantry… (e.g. dried oregano)" : "Add to freezer… (e.g. frozen peas)"} className="h-11 rounded-full" />
-        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-full" aria-label="Add"><Plus className="h-5 w-5" /></Button>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder={loc === "pantry" ? "Add to pantry… (e.g. dried oregano)" : "Add to freezer… (e.g. frozen peas)"} className="h-11 rounded-lg" />
+        <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-lg" aria-label="Add"><Plus className="h-5 w-5" /></Button>
       </form>
       {items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed bg-card p-6 text-center text-muted-foreground">Nothing here yet. Add what you have, or tap "I have this" on your shopping list. 🫙</p>
+        <EmptyState kind="jar"><p>Empty shelf. Add what you have, or tap the box icon on your shopping list.</p></EmptyState>
       ) : (
-        <ul className="divide-y rounded-2xl border bg-card">
+        <ul>
           {items.map((i) => (
-            <li key={i.id} className="flex items-center gap-2 px-4 py-3">
+            <li key={i.id} className="dotted-rule flex items-center gap-2 py-3">
               <span className="flex-1">{i.name}</span>
-              <Button size="sm" variant="secondary" className="rounded-full" onClick={async () => {
+              <Button size="sm" variant="secondary" className="rounded-lg" onClick={async () => {
                 await addCustomItem(week, i.name, guessCategory(i.name));
                 await deletePantryItem(i.id);
                 refresh(); qc.invalidateQueries({ queryKey: qk.custom(week) });

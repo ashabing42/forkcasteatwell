@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Leaf } from "lucide-react";
+import { Fork } from "@/components/icons";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -11,10 +11,10 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — MealMap" },
-      { name: "description", content: "Sign in to MealMap to plan your healthy week." },
-      { property: "og:title", content: "Sign in — MealMap" },
-      { property: "og:description", content: "Sign in to MealMap to plan your healthy week." },
+      { title: "Sign in — Forkcast" },
+      { name: "description", content: "Sign in to Forkcast to plan your healthy week." },
+      { property: "og:title", content: "Sign in — Forkcast" },
+      { property: "og:description", content: "Sign in to Forkcast to plan your healthy week." },
     ],
   }),
   component: AuthPage,
@@ -70,25 +70,25 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-secondary text-primary"><Leaf className="h-7 w-7" /></div>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-secondary"><Fork className="h-7 w-7" /></div>
           <h1 className="text-3xl">{mode === "signin" ? "Welcome back" : "Let's get you planning"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">Your healthy week, sorted in a minute.</p>
         </div>
         {sent ? (
-          <div className="rounded-2xl border bg-card p-6 text-center shadow-soft">
-            <h2 className="text-xl">Check your inbox 📬</h2>
+          <div className="rounded-lg border bg-card p-6 text-center">
+            <h2 className="text-xl">Check your inbox</h2>
             <p className="mt-2 text-sm text-muted-foreground">We sent a confirmation link to {email}. Click it and you're in.</p>
           </div>
         ) : (
-          <div className="rounded-2xl border bg-card p-6 shadow-soft">
-            <button type="button" onClick={google} className="flex h-11 w-full items-center justify-center gap-[10px] rounded-full border border-[#747775] bg-[#FFFFFF] px-3 text-sm font-medium text-[#1F1F1F]">
+          <div className="rounded-lg border bg-card p-6">
+            <button type="button" onClick={google} className="flex h-11 w-full items-center justify-center gap-[10px] rounded-lg border border-[#747775] bg-[#FFFFFF] px-3 text-sm font-medium text-[#1F1F1F]">
               <GoogleLogo /> Continue with Google
             </button>
             <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />or<span className="h-px flex-1 bg-border" /></div>
             <form onSubmit={submit} className="space-y-4">
               <div className="space-y-1.5"><Label htmlFor="email">Email</Label><Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 rounded-xl" /></div>
               <div className="space-y-1.5"><Label htmlFor="pw">Password</Label><Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 rounded-xl" /></div>
-              <Button type="submit" disabled={busy} className="h-11 w-full rounded-full">{mode === "signin" ? "Sign in" : "Create my account"}</Button>
+              <Button type="submit" disabled={busy} className="h-11 w-full rounded-lg">{mode === "signin" ? "Sign in" : "Create my account"}</Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">
               {mode === "signin" ? "New here?" : "Already have an account?"}{" "}

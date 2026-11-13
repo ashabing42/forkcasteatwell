@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
-import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Leaf, Archive } from "lucide-react";
+import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Archive, Fork } from "@/components/icons";
 import { fetchProfile, qk } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -25,45 +25,34 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [profile, onboarding, navigate]);
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center text-primary">
-        <Leaf className="h-8 w-8 animate-pulse" />
-      </div>
-    );
+    return <div className="flex min-h-screen items-center justify-center"><Fork className="h-8 w-8 animate-pulse" /></div>;
   }
 
-  if (onboarding) return <main className="mx-auto min-h-screen max-w-xl px-5 py-8">{children}</main>;
+  if (onboarding) return <main className="mx-auto min-h-screen max-w-xl px-5 py-10">{children}</main>;
 
   return (
     <div className="min-h-screen pb-24 md:pb-0 md:pl-56">
-      <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r bg-card px-4 py-6 md:flex">
-        <Link to="/today" className="mb-8 flex items-center gap-2 px-2 font-display text-2xl text-primary">
-          <Leaf className="h-6 w-6" /> MealMap
+      <aside className="fixed inset-y-0 left-0 hidden w-56 flex-col border-r px-5 py-8 md:flex">
+        <Link to="/today" className="mb-10 flex items-center gap-2 font-display text-2xl">
+          <Fork className="h-6 w-6" /> Forkcast
         </Link>
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col">
           {TABS.map((t) => (
-            <Link
-              key={t.to}
-              to={t.to}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
-              activeProps={{ className: "bg-secondary !text-secondary-foreground" }}
-            >
+            <Link key={t.to} to={t.to} className="flex items-center gap-3 border-b border-border/70 py-3 text-[15px] text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "!text-foreground font-medium" }}>
               <t.icon className="h-5 w-5" /> {t.label}
             </Link>
           ))}
         </nav>
       </aside>
-      <main className="mx-auto max-w-4xl px-4 py-6 md:px-8 md:py-10">{children}</main>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 backdrop-blur md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+      <main className="mx-auto max-w-3xl px-4 py-8 md:px-10 md:py-12">{children}</main>
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background md:hidden" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
         <div className="grid grid-cols-6">
           {TABS.map((t) => {
             const active = pathname.startsWith(t.to);
             return (
-              <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium", active ? "text-primary" : "text-muted-foreground")}>
-                <span className={cn("rounded-full px-3 py-1 transition-colors", active && "bg-secondary")}>
-                  <t.icon className="h-5 w-5" />
-                </span>
-                {t.label}
+              <Link key={t.to} to={t.to} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px]", active ? "text-foreground" : "text-muted-foreground")}>
+                <t.icon className="h-6 w-6" />
+                <span className={cn(active && "border-b-2 border-highlight")}>{t.label}</span>
               </Link>
             );
           })}
