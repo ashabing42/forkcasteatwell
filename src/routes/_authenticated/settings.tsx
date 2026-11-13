@@ -24,7 +24,7 @@ function Settings() {
       <ProfileForm initial={profile} showTimes submitLabel="Save changes" onSubmit={async (d) => {
         await saveProfile({ ...d, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
         await qc.invalidateQueries({ queryKey: qk.profile });
-        toast.success("Saved! Your next plan will use these.");
+        toast.success("Saved. Your next plan will use these.");
       }} />
       <section className="rounded-lg border bg-card p-5">
         <h2 className="text-xl">Calendar subscription</h2>

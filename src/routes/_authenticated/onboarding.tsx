@@ -36,7 +36,7 @@ function Onboarding() {
     <div>
       <div className="mb-8">
         <Leaf className="h-8 w-8 text-primary" />
-        <h1 className="mt-3 text-3xl">Hi there! Let's set up your week.</h1>
+        <h1 className="mt-3 text-3xl">Let’s set up your week.</h1>
         <p className="mt-2 text-muted-foreground">Three quick questions and you'll have a plan. You can change this anytime in Settings.</p>
       </div>
       <ProfileForm

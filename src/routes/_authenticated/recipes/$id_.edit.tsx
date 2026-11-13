@@ -39,7 +39,7 @@ function RecipeForm({ id, initial }: { id: string | null; initial: RecipeInput }
     try {
       const saved = await saveRecipe(id, clean);
       await qc.invalidateQueries({ queryKey: qk.recipes });
-      toast.success("Recipe saved — yum!");
+      toast.success("Recipe saved.");
       navigate({ to: "/recipes/$id", params: { id: saved } });
     } catch (err) { toast.error((err as Error).message); }
   }
