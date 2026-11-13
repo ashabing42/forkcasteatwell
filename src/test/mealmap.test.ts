@@ -35,3 +35,15 @@ describe("weekly setup", () => {
     expect(_empty("2026-11-16", { days: 4, meals: ["dinner"] })).toHaveLength(4);
   });
 });
+
+import { splitByPantry as _split } from "@/lib/mealmap";
+describe("pantry", () => {
+  it("moves ingredients already in the pantry out of the buy list", () => {
+    const r = _split([{ name: "Dried oregano" }, { name: "Onions" }], ["dried oregano"]);
+    expect(r.atHome.map((l) => l.name)).toEqual(["Dried oregano"]);
+    expect(r.toBuy.map((l) => l.name)).toEqual(["Onions"]);
+  });
+  it("matches singular and plural names", () => {
+    expect(_split([{ name: "Chickpeas" }], ["chickpea"]).atHome).toHaveLength(1);
+  });
+});

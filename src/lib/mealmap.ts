@@ -380,3 +380,17 @@ export function parseIsoDuration(v: unknown): number {
   if (!m) return 0;
   return (Number(m[1] ?? 0) * 24 + Number(m[2] ?? 0)) * 60 + Number(m[3] ?? 0);
 }
+
+// ---------- pantry ----------
+export const PANTRY_CATEGORIES = ["pantry", "spices", "frozen"] as const;
+export function pantryKey(name: string): string {
+  return normalizeName(name);
+}
+/** Split shopping lines into what to buy vs. what's already at home (matched by ingredient name). */
+export function splitByPantry<T extends { name: string }>(lines: T[], pantryNames: string[]): { toBuy: T[]; atHome: T[] } {
+  const have = new Set(pantryNames.map(pantryKey));
+  const toBuy: T[] = [];
+  const atHome: T[] = [];
+  for (const l of lines) (have.has(pantryKey(l.name)) ? atHome : toBuy).push(l);
+  return { toBuy, atHome };
+}
