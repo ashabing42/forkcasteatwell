@@ -29,6 +29,13 @@
       "when": 1794598934946,
       "tag": "0003_spoonacular_cache",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794599683746,
+      "tag": "0004_lock_external_recipes",
+      "breakpoints": true
     }
   ]
 }
