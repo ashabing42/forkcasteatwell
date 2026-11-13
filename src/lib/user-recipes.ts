@@ -36,7 +36,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
     "name": "coconut milk",
     "quantity": 100,
     "unit": "ml",
-    "category": "dairy"
+    "category": "pantry"
    },
    {
     "name": "spinach (60 g)",
@@ -107,7 +107,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
     "name": "peanut butter",
     "quantity": 2,
     "unit": "tbsp",
-    "category": "dairy"
+    "category": "pantry"
    },
    {
     "name": "soy sauce",
@@ -458,7 +458,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
     "name": "peanut or almond butter",
     "quantity": 1,
     "unit": "tbsp",
-    "category": "dairy"
+    "category": "pantry"
    },
    {
     "name": "banana",
@@ -1332,7 +1332,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
     "name": "berries or yogurt",
     "quantity": null,
     "unit": "",
-    "category": "dairy"
+    "category": "produce"
    }
   ],
   "steps": [
