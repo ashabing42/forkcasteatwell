@@ -83,3 +83,4 @@ export function searchParams(diets: string[], meal: string | null, query: string
   if (meal === "breakfast") p["type"] = "breakfast"; else if (meal === "lunch") p["type"] = "salad,soup,main course"; else if (meal === "dinner") p["type"] = "main course";
   return p;
 }
+export const IMPORT_DRAFT_KEY = "forkcast:import-draft";

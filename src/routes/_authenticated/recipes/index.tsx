@@ -12,9 +12,10 @@ import { EmptyState } from "@/components/Doodle";
 import { DIETS, DIET_TAGS, MEALS, MEAL_LABEL } from "@/lib/mealmap";
 import { qk, saveRecipe } from "@/lib/api";
 import { discoverRecipes, extractRecipeFromUrl } from "@/lib/spoonacular.functions";
+import { IMPORT_DRAFT_KEY } from "@/lib/spoonacular";
 import { cn } from "@/lib/utils";
 
-export const IMPORT_DRAFT_KEY = "forkcast:import-draft";
+
 
 export const Route = createFileRoute("/_authenticated/recipes/")({
   head: () => ({ meta: [{ title: "Recipe book — Forkcast" }, { name: "description", content: "Your recipes, plus a wider shelf to browse." }] }),
@@ -80,7 +81,7 @@ function ImportDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o:
       const draft = await extract({ data: { url } });
       sessionStorage.setItem(IMPORT_DRAFT_KEY, JSON.stringify(draft));
       onOpenChange(false);
-      navigate({ to: "/recipes/$id/edit", params: { id: "new" }, search: { imported: 1 } as never });
+      navigate({ to: "/recipes/$id/edit", params: { id: "new" } });
     } catch (err) { toast.error((err as Error).message || "That link didn't work."); }
     finally { setBusy(false); }
   }
