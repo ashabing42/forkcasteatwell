@@ -10,33 +10,169 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedPlanRouteImport } from './routes/_authenticated/plan'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedShoppingRouteImport } from './routes/_authenticated/shopping'
+import { Route as AuthenticatedTodayRouteImport } from './routes/_authenticated/today'
+import { Route as AuthenticatedRecipesIndexRouteImport } from './routes/_authenticated/recipes/index'
+import { Route as AuthenticatedRecipesIdRouteImport } from './routes/_authenticated/recipes/$id'
+import { Route as AuthenticatedRecipesIdEditRouteImport } from './routes/_authenticated/recipes/$id_.edit'
+import { Route as ApiPublicCalendarTokenRouteImport } from './routes/api/public/calendar.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanRoute = AuthenticatedPlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedShoppingRoute = AuthenticatedShoppingRouteImport.update({
+  id: '/shopping',
+  path: '/shopping',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTodayRoute = AuthenticatedTodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRecipesIndexRoute =
+  AuthenticatedRecipesIndexRouteImport.update({
+    id: '/recipes/',
+    path: '/recipes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRecipesIdRoute = AuthenticatedRecipesIdRouteImport.update({
+  id: '/recipes/$id',
+  path: '/recipes/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRecipesIdEditRoute =
+  AuthenticatedRecipesIdEditRouteImport.update({
+    id: '/recipes/$id_/edit',
+    path: '/recipes/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicCalendarTokenRoute = ApiPublicCalendarTokenRouteImport.update({
+  id: '/api/public/calendar/$token',
+  path: '/api/public/calendar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plan': typeof AuthenticatedPlanRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/shopping': typeof AuthenticatedShoppingRoute
+  '/today': typeof AuthenticatedTodayRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes/': typeof AuthenticatedRecipesIndexRoute
+  '/recipes/$id/edit': typeof AuthenticatedRecipesIdEditRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/plan': typeof AuthenticatedPlanRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/shopping': typeof AuthenticatedShoppingRoute
+  '/today': typeof AuthenticatedTodayRoute
+  '/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/recipes': typeof AuthenticatedRecipesIndexRoute
+  '/recipes/$id/edit': typeof AuthenticatedRecipesIdEditRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/plan': typeof AuthenticatedPlanRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/shopping': typeof AuthenticatedShoppingRoute
+  '/_authenticated/today': typeof AuthenticatedTodayRoute
+  '/_authenticated/recipes/$id': typeof AuthenticatedRecipesIdRoute
+  '/_authenticated/recipes/': typeof AuthenticatedRecipesIndexRoute
+  '/_authenticated/recipes/$id_/edit': typeof AuthenticatedRecipesIdEditRoute
+  '/api/public/calendar/$token': typeof ApiPublicCalendarTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/plan'
+    | '/settings'
+    | '/shopping'
+    | '/today'
+    | '/recipes/$id'
+    | '/recipes/'
+    | '/recipes/$id/edit'
+    | '/api/public/calendar/$token'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/plan'
+    | '/settings'
+    | '/shopping'
+    | '/today'
+    | '/recipes/$id'
+    | '/recipes'
+    | '/recipes/$id/edit'
+    | '/api/public/calendar/$token'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/onboarding'
+    | '/_authenticated/plan'
+    | '/_authenticated/settings'
+    | '/_authenticated/shopping'
+    | '/_authenticated/today'
+    | '/_authenticated/recipes/$id'
+    | '/_authenticated/recipes/'
+    | '/_authenticated/recipes/$id_/edit'
+    | '/api/public/calendar/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ApiPublicCalendarTokenRoute: typeof ApiPublicCalendarTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +184,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plan': {
+      id: '/_authenticated/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof AuthenticatedPlanRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/shopping': {
+      id: '/_authenticated/shopping'
+      path: '/shopping'
+      fullPath: '/shopping'
+      preLoaderRoute: typeof AuthenticatedShoppingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/today': {
+      id: '/_authenticated/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof AuthenticatedTodayRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/recipes/': {
+      id: '/_authenticated/recipes/'
+      path: '/recipes'
+      fullPath: '/recipes/'
+      preLoaderRoute: typeof AuthenticatedRecipesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/recipes/$id': {
+      id: '/_authenticated/recipes/$id'
+      path: '/recipes/$id'
+      fullPath: '/recipes/$id'
+      preLoaderRoute: typeof AuthenticatedRecipesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/recipes/$id_/edit': {
+      id: '/_authenticated/recipes/$id_/edit'
+      path: '/recipes/$id/edit'
+      fullPath: '/recipes/$id/edit'
+      preLoaderRoute: typeof AuthenticatedRecipesIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/calendar/$token': {
+      id: '/api/public/calendar/$token'
+      path: '/api/public/calendar/$token'
+      fullPath: '/api/public/calendar/$token'
+      preLoaderRoute: typeof ApiPublicCalendarTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPlanRoute: typeof AuthenticatedPlanRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedShoppingRoute: typeof AuthenticatedShoppingRoute
+  AuthenticatedTodayRoute: typeof AuthenticatedTodayRoute
+  AuthenticatedRecipesIdRoute: typeof AuthenticatedRecipesIdRoute
+  AuthenticatedRecipesIndexRoute: typeof AuthenticatedRecipesIndexRoute
+  AuthenticatedRecipesIdEditRoute: typeof AuthenticatedRecipesIdEditRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPlanRoute: AuthenticatedPlanRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedShoppingRoute: AuthenticatedShoppingRoute,
+  AuthenticatedTodayRoute: AuthenticatedTodayRoute,
+  AuthenticatedRecipesIdRoute: AuthenticatedRecipesIdRoute,
+  AuthenticatedRecipesIndexRoute: AuthenticatedRecipesIndexRoute,
+  AuthenticatedRecipesIdEditRoute: AuthenticatedRecipesIdEditRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ApiPublicCalendarTokenRoute: ApiPublicCalendarTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
