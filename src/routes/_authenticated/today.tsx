@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bell, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePlan, useRecipes } from "@/hooks/use-mealmap";
-import { buildIcs, computePrepEvents, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";
+import { buildIcs, computeMealEvents, computePrepEvents, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/today")({
   head: () => ({ meta: [{ title: "Today — MealMap" }, { name: "description", content: "Today's meals and prep tasks." }] }),
@@ -68,7 +68,7 @@ function Today() {
         )}
       </section>
       {events.length > 0 && (
-        <Button variant="secondary" className="rounded-full" onClick={() => downloadIcs(buildIcs(events), `mealmap-${week}.ics`)}><Download className="mr-2 h-4 w-4" /> Add reminders to my calendar</Button>
+        <Button variant="secondary" className="rounded-full" onClick={() => downloadIcs(buildIcs([...computeMealEvents(slots, recipes, profile.data!), ...events]), `mealmap-${week}.ics`)}><Download className="mr-2 h-4 w-4" /> Add reminders to my calendar</Button>
       )}
     </div>
   );

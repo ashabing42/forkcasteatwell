@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { CalendarConnect } from "@/components/CalendarConnect";
+import { Button } from "@/components/ui/button";
 import { Leaf } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
@@ -16,7 +19,19 @@ function Onboarding() {
   const { data: profile } = useProfile();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const [done, setDone] = useState(false);
   if (!profile) return null;
+  if (done) return (
+    <div className="space-y-6">
+      <div>
+        <Leaf className="h-8 w-8 text-primary" />
+        <h1 className="mt-3 text-3xl">Your week is ready 🎉</h1>
+        <p className="mt-2 text-muted-foreground">Want your meals and prep reminders (like "thaw the chicken tonight") in your calendar? One tap and it stays up to date.</p>
+      </div>
+      <CalendarConnect token={profile.calendar_token} />
+      <Button variant="outline" size="lg" className="w-full rounded-full" onClick={() => navigate({ to: "/plan" })}>See my week</Button>
+    </div>
+  );
   return (
     <div>
       <div className="mb-8">
@@ -38,7 +53,7 @@ function Onboarding() {
             await qc.invalidateQueries({ queryKey: qk.plan(week) });
             await qc.invalidateQueries({ queryKey: qk.profile });
             await qc.invalidateQueries({ queryKey: qk.recipes });
-            navigate({ to: "/plan" });
+            setDone(true);
           } catch (e) {
             toast.error((e as Error).message);
           }

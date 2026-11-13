@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildIcs, computePrepEvents, reconcileSlots, type Profile, type Recipe, type Slot } from "@/lib/mealmap";
+import { buildIcs, computeMealEvents, computePrepEvents, reconcileSlots, type Profile, type Recipe, type Slot } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/api/public/calendar/$token")({
   server: {
@@ -16,7 +16,12 @@ export const Route = createFileRoute("/api/public/calendar/$token")({
           supabaseAdmin.from("recipes").select("*").eq("user_id", profile.id),
         ]);
         const rs = (recipes ?? []) as unknown as Recipe[];
-        const events = (plans ?? []).flatMap((p) => computePrepEvents(reconcileSlots(p.week_start, (p.settings as unknown as { days: number; meals: string[] } | null) ?? profile, p.slots as unknown as Slot[]), rs, profile as unknown as Profile));
+        const prof = profile as unknown as Profile;
+        const events = (plans ?? []).flatMap((p) => {
+          const ws = (p.settings as unknown as { days: number; meals: string[]; servings: number } | null) ?? prof;
+          const slots = reconcileSlots(p.week_start, ws, p.slots as unknown as Slot[]);
+          return [...computeMealEvents(slots, rs, prof, ws.servings), ...computePrepEvents(slots, rs, prof)];
+        });
         return new Response(buildIcs(events), { headers: { "content-type": "text/calendar; charset=utf-8", "cache-control": "no-cache" } });
       },
     },

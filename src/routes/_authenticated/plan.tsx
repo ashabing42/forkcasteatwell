@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { CalendarConnect } from "@/components/CalendarConnect";
 import { WeekNav } from "@/components/WeekNav";
 import { usePlan, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
 import { buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, MEAL_LABEL, parseISODate, surpriseFor, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
@@ -30,6 +31,7 @@ function PlanPage() {
   const recipes = useRecipes();
   const save = useSavePlan(week);
   const [swapping, setSwapping] = useState<Slot | null>(null);
+  const [askCalendar, setAskCalendar] = useState(false);
 
   const list = recipes.data ?? [];
   const byId = new Map(list.map((r) => [r.id, r]));
@@ -58,7 +60,7 @@ function PlanPage() {
     save.mutate({ settings: s, slots: next });
     setEditing(false);
     if (next.every((x) => !x.recipe_id)) toast("No recipes match that diet yet — add a few in Recipes and try again.");
-    else toast.success("Your week is ready 🎉");
+    else setAskCalendar(true);
   }
 
   const showSetup = editing || (!hasWeekSettings && !hasAny);
@@ -94,6 +96,14 @@ function PlanPage() {
 
   return (
     <div>
+      <Dialog open={askCalendar} onOpenChange={setAskCalendar}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader><DialogTitle>Your week is ready 🎉</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">Put this week's meals and prep reminders in your calendar. Already added it? You're all set, it updates by itself.</p>
+          {profile.data && <CalendarConnect token={profile.data.calendar_token} compact />}
+          <Button variant="outline" className="rounded-full" onClick={() => setAskCalendar(false)}>Maybe later</Button>
+        </DialogContent>
+      </Dialog>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl">Your week</h1>
