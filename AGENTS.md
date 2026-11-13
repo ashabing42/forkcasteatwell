@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Domain logic (planning, shopping aggregation, prep scheduling, ICS) lives in pure functions in src/lib/mealmap.ts so it is unit-testable and shared by the UI and the calendar feed route.
+- Prep reminders are computed from the saved plan on demand, not stored, so they always reflect the current plan.
+- Seed recipes are inserted per user at onboarding from src/lib/seed-recipes.ts.
