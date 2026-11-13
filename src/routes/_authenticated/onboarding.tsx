@@ -4,7 +4,8 @@ import { Leaf } from "lucide-react";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
 import { useProfile } from "@/hooks/use-mealmap";
-import { qk, saveProfile, seedRecipesIfEmpty } from "@/lib/api";
+import { fetchRecipes, qk, savePlan, saveProfile, seedRecipesIfEmpty } from "@/lib/api";
+import { buildEmptySlots, generatePlan, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Welcome — MealMap" }, { name: "description", content: "Set up your MealMap diet and plan." }] }),
@@ -30,6 +31,11 @@ function Onboarding() {
           try {
             await saveProfile({ ...d, onboarded: true, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
             await seedRecipesIfEmpty();
+            // These answers also plan the current week, so the Plan page opens already filled.
+            const week = weekStartOf(new Date());
+            const settings = { diets: d.diets, servings: d.servings, days: d.days, meals: d.meals };
+            await savePlan(week, { settings, slots: generatePlan(buildEmptySlots(week, settings), await fetchRecipes(), d.diets) });
+            await qc.invalidateQueries({ queryKey: qk.plan(week) });
             await qc.invalidateQueries({ queryKey: qk.profile });
             await qc.invalidateQueries({ queryKey: qk.recipes });
             navigate({ to: "/plan" });

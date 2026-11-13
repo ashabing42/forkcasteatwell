@@ -34,6 +34,6 @@ export function useSavePlan(week: string) {
       return { prev };
     },
     onError: (_e, _p, ctx) => ctx && qc.setQueryData(qk.plan(week), ctx.prev),
-    onSettled: () => qc.invalidateQueries({ queryKey: qk.plan(week) }),
+    onSettled: () => { qc.invalidateQueries({ queryKey: qk.plan(week) }); qc.invalidateQueries({ queryKey: ["prevSettings"] }); },
   });
 }
