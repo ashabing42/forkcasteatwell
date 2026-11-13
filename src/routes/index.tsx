@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { CalendarDays, Leaf, ShoppingBasket, Timer } from "lucide-react";
+import { CalendarDays, Leaf, ShoppingBasket, Timer } from "@/components/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 

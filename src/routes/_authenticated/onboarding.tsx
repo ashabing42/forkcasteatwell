@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CalendarConnect } from "@/components/CalendarConnect";
 import { Button } from "@/components/ui/button";
-import { Leaf } from "lucide-react";
+import { Leaf } from "@/components/icons";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
 import { useProfile } from "@/hooks/use-mealmap";

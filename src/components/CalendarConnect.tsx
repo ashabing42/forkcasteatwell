@@ -1,4 +1,4 @@
-import { CalendarPlus, Copy } from "lucide-react";
+import { CalendarPlus, Copy } from "@/components/icons";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { googleCalendarSubscribeUrl } from "@/lib/mealmap";

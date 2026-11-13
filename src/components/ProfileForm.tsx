@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Minus, Plus } from "lucide-react";
+import { Check, Minus, Plus } from "@/components/icons";
 import { DIETS, MEALS, MEAL_LABEL } from "@/lib/mealmap";
 import type { ProfileRow } from "@/lib/api";
 import { Button } from "@/components/ui/button";

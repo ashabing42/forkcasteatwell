@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bell, Download } from "lucide-react";
+import { Bell, Download } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { usePlan, useRecipes } from "@/hooks/use-mealmap";
 import { buildIcs, computeMealEvents, computePrepEvents, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";

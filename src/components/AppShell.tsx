@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, type ReactNode } from "react";
-import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Leaf, Archive } from "lucide-react";
+import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Leaf, Archive } from "@/components/icons";
 import { fetchProfile, qk } from "@/lib/api";
 import { cn } from "@/lib/utils";
 

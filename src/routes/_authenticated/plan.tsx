@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Lock, LockOpen, RefreshCw, Shuffle, Sparkles, X, Clock, Repeat, SlidersHorizontal } from "lucide-react";
+import { Lock, LockOpen, RefreshCw, Shuffle, Sparkles, X, Clock, Repeat, SlidersHorizontal } from "@/components/icons";
 import { ProfileForm } from "@/components/ProfileForm";
 import { fetchPreviousSettings, qk, type WeekSettings } from "@/lib/api";
 import { z } from "zod";

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Clock, Pencil, Trash2, Users, Bell } from "lucide-react";
+import { Clock, Pencil, Trash2, Users, Bell } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { useRecipes } from "@/hooks/use-mealmap";
 import { deleteRecipe, qk } from "@/lib/api";
