@@ -24,3 +24,14 @@ describe("MealMap rules", () => {
     expect(out.slice(1).every((s) => s.recipe_id === "v")).toBe(true);
   });
 });
+
+import { USER_RECIPES } from "@/lib/user-recipes";
+import { buildEmptySlots as _empty } from "@/lib/mealmap";
+describe("weekly setup", () => {
+  it("includes all 20 recipes from the owner's pack", () => {
+    expect(USER_RECIPES).toHaveLength(20);
+  });
+  it("plans only the days and meals chosen for that week", () => {
+    expect(_empty("2026-11-16", { days: 4, meals: ["dinner"] })).toHaveLength(4);
+  });
+});
