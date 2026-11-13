@@ -33,3 +33,4 @@ use the editor.
 - Domain logic (planning, shopping aggregation, prep scheduling, ICS) lives in pure functions in src/lib/mealmap.ts so it is unit-testable and shared by the UI and the calendar feed route.
 - Prep reminders are computed from the saved plan on demand, not stored, so they always reflect the current plan.
 - Seed recipes are inserted per user at onboarding from src/lib/seed-recipes.ts.
+- Each week stores its own setup (diets, people, days, meals) on the meal plan; the profile only supplies defaults, so past weeks keep their own shopping amounts.
