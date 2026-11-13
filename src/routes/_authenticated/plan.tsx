@@ -149,7 +149,7 @@ function PlanPage() {
                     ) : <div className="h-14 w-14 shrink-0 rounded-lg border border-dashed" />}
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{MEAL_LABEL[slot.meal]}</p>
-                      {r ? <Link to="/recipes/$id" params={{ id: r.id }} className="block truncate font-display text-lg leading-snug">{r.title}</Link> : <p className="font-display text-lg italic text-muted-foreground">Open slot</p>}
+                      {r ? <Link to="/recipes/$id" params={{ id: r.id }} className="line-clamp-2 font-display text-lg leading-snug">{r.title}</Link> : <p className="font-display text-lg italic text-muted-foreground">Open slot</p>}
                       {r && <p className="text-xs text-muted-foreground tabular">{r.prep_minutes + r.cook_minutes} min{r.prep_tasks.length > 0 && <span className="text-tomato"> · prep ahead</span>}</p>}
                     </div>
                     <Button size="sm" variant="ghost" onClick={() => setSwapping(slot)}>Swap</Button>

@@ -61,7 +61,7 @@ function Today() {
       )}
 
       <section>
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep due today</h2>
+        <h2 className="mb-3 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep due today</h2>
         {due.length === 0 ? (
           <p className="text-muted-foreground">No prep today. Put the kettle on.</p>
         ) : (
@@ -78,7 +78,7 @@ function Today() {
 
       {rest.length > 0 && (
         <section>
-          <h2 className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Also today</h2>
+          <h2 className="mb-1 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Also today</h2>
           <ul>
             {rest.map((s) => { const r = byId.get(s.recipe_id!)!; return (
               <li key={s.meal} className="dotted-rule">
