@@ -79,3 +79,16 @@ describe("metric shopping list", () => {
     expect(_tm("oat milk", 1, "cup")).toEqual({ quantity: 240, unit: "ml" });
   });
 });
+
+describe("shopping list duplicates", () => {
+  it("merges singular/plural and count + grams (5 cherry tomatoes + 200 g = 275 g)", () => {
+    const recipes = [
+      { id: "a", servings: 2, ingredients: [{ name: "cherry tomatoes", quantity: 5, unit: "", category: "produce" }, { name: "carrot", quantity: 1, unit: "", category: "produce" }] },
+      { id: "b", servings: 2, ingredients: [{ name: "cherry tomato", quantity: 200, unit: "g", category: "produce" }, { name: "carrots", quantity: 2, unit: "", category: "produce" }] },
+    ] as never;
+    const list = _bsl([{ recipe_id: "a" }, { recipe_id: "b" }] as never, recipes, 2);
+    expect(list).toHaveLength(2);
+    expect(list.find((l) => l.name.startsWith("cherry"))).toMatchObject({ unit: "g", quantity: 275 });
+    expect(list.find((l) => l.name.startsWith("carrot"))).toMatchObject({ unit: "", quantity: 3 });
+  });
+});

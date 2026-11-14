@@ -145,7 +145,7 @@ const UNIT_ALIASES: Record<string, string> = {
   cups: "cup", grams: "g", gram: "g", kilograms: "kg", kilogram: "kg",
   milliliters: "ml", millilitres: "ml", liter: "l", liters: "l", litres: "l",
   ounces: "oz", ounce: "oz", pounds: "lb", pound: "lb", lbs: "lb",
-  cloves: "clove", cans: "can", pieces: "", piece: "", pcs: "", whole: "",
+  cloves: "clove", cans: "can", pieces: "", piece: "", pcs: "", whole: "", head: "", heads: "",
 };
 export function normalizeUnit(u: string): string {
   const k = (u || "").trim().toLowerCase().replace(/\.$/, "");
@@ -188,6 +188,13 @@ export function toMetric(name: string, quantity: number | null, unit: string): {
     default: return { quantity, unit: u };
   }
 }
+// Typical weight of one piece, used to merge "5 cherry tomatoes" with "200 g cherry tomatoes".
+const PIECE_GRAMS: [RegExp, number][] = [
+  [/cherry tomato/, 15], [/tomato/, 120], [/onion|shallot/, 150], [/potato/, 150], [/carrot/, 70],
+  [/garlic/, 5], [/pepper/, 160], [/courgette|zucchini/, 200], [/cucumber/, 300], [/broccoli/, 350],
+  [/lemon|lime/, 80], [/banana/, 120], [/apple/, 180], [/avocado/, 170], [/mushroom/, 20],
+  [/chicken breast/, 180], [/egg/, 55],
+];
 const ML_PER = { tsp: 5, tbsp: 15, ml: 1 } as Record<string, number>;
 
 export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: number): ShoppingLine[] {
@@ -213,6 +220,17 @@ export function buildShoppingList(slots: Slot[], recipes: Recipe[], servings: nu
         acc.set(key, { key, name: ing.name.trim(), quantity: q == null ? null : roundQty(q), unit, category: ing.category || "other" });
       }
     }
+  }
+  // Same ingredient listed by count in one recipe and by weight in another: fold counts into grams.
+  const lines = [...acc.values()];
+  for (const l of lines) {
+    if (l.unit !== "" || l.quantity == null) continue;
+    const base = l.key.split("|")[0]!;
+    const g = acc.get(`${base}|g`);
+    const per = PIECE_GRAMS.find(([re]) => re.test(base))?.[1];
+    if (!g || !per) continue;
+    g.quantity = roundQty((g.quantity ?? 0) + l.quantity * per);
+    acc.delete(l.key);
   }
   // Small volumes read better as spoons.
   for (const l of acc.values()) {
