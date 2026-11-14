@@ -44,10 +44,11 @@ const ES: Record<string, string> = {
 
 export function toSpanish(item: string): string {
   const n = item.toLowerCase().trim().replace(/\s+/g, " ");
-  if (ES[n]) return ES[n];
+  const direct = ES[n];
+  if (direct) return direct;
   // longest English phrase contained in the item
   const hit = Object.keys(ES).filter((k) => new RegExp(`\\b${k}\\b`).test(n)).sort((a, b) => b.length - a.length)[0];
-  return hit ? ES[hit] : item.trim();
+  return (hit && ES[hit]) || item.trim();
 }
 
 export function storeSearchUrl(store: StoreId, item: string): string {
