@@ -12,3 +12,10 @@ describe("store search links", () => {
     expect(plainList([{ name: "oats", qty: "200 g" }, { name: "coffee" }])).toBe("- oats (200 g)\n- coffee");
   });
 });
+
+import { toSpanish } from "@/lib/stores";
+describe("toSpanish", () => {
+  it("translates known terms", () => { expect(toSpanish("Red lentils")).toBe("lentejas rojas"); expect(toSpanish("dried oregano")).toBe("orégano"); });
+  it("uses longest match inside a phrase", () => expect(toSpanish("fresh chicken breast")).toBe("pechuga de pollo"));
+  it("falls back to original", () => expect(toSpanish("za'atar")).toBe("za'atar"));
+});
