@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/Doodle";
 import { WeekNav } from "@/components/WeekNav";
 import { usePlan, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
 import { addCustomItem, addPantryItem, deleteCustomItem, fetchCustomItems, fetchPantry, qk, toggleCustomItem } from "@/lib/api";
-import { STORES, storeSearchUrl, plainList, type StoreId } from "@/lib/stores";
+import { STORES, storeLogoUrl, storeSearchUrl, plainList, type StoreId } from "@/lib/stores";
 import { buildShoppingList, splitByPantry, CATEGORIES, CATEGORY_LABEL, formatQty, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/shopping")({
@@ -58,7 +58,7 @@ function Shopping() {
         <div className="flex items-center gap-2 text-sm">
           <span className="text-muted-foreground">Shop at</span>
           {STORES.map((s) => (
-            <button key={s.id} type="button" onClick={() => pickStore(s.id)} aria-pressed={store === s.id} className={store === s.id ? "rounded-lg bg-highlight px-3 py-1 font-medium" : "rounded-lg px-3 py-1 text-muted-foreground hover:text-foreground"}>{s.label}</button>
+            <button key={s.id} type="button" onClick={() => pickStore(s.id)} aria-pressed={store === s.id} className={store === s.id ? "flex items-center gap-2 rounded-lg bg-highlight px-3 py-1 font-medium" : "flex items-center gap-2 rounded-lg px-3 py-1 text-muted-foreground hover:text-foreground"}><img src={storeLogoUrl(s.domain)} alt="" className="h-5 w-5 rounded" loading="lazy" />{s.label}</button>
           ))}
         </div>
         <Button type="button" variant="outline" size="sm" className="rounded-lg" onClick={copyList}><Copy className="mr-1 h-4 w-4" />Copy list</Button>
