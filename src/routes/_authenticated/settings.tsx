@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { checkIsAdmin } from "@/lib/admin.functions";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,7 @@ function Settings() {
   const { data: profile } = useProfile();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const { data: admin } = useQuery({ queryKey: ["is-admin"], queryFn: () => checkIsAdmin(), staleTime: 60_000 });
   if (!profile) return null;
   return (
     <div className="space-y-10">
@@ -31,6 +34,7 @@ function Settings() {
         <p className="mt-1 text-sm text-muted-foreground">Your private calendar of meals and prep reminders. Keep the link to yourself.</p>
         <div className="mt-4"><CalendarConnect token={profile.calendar_token} /></div>
       </section>
+      {admin?.isAdmin && <Button asChild variant="outline" className="w-full rounded-lg"><Link to="/admin">Open admin</Link></Button>}
       <Button variant="outline" className="w-full rounded-lg" onClick={async () => { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sign out</Button>
     </div>
   );

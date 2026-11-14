@@ -34,3 +34,4 @@ use the editor.
 - Prep reminders are computed from the saved plan on demand, not stored, so they always reflect the current plan.
 - Seed recipes are inserted per user at onboarding from src/lib/seed-recipes.ts.
 - Each week stores its own setup (diets, people, days, meals) on the meal plan; the profile only supplies defaults, so past weeks keep their own shopping amounts.
+- Admin access is checked server-side via `has_role` on `user_roles`; impersonation mints a magic-link token server-side, stashes the admin session in localStorage and restores it via setSession — so every admin action is re-verified and audited in `admin_audit`.
