@@ -38,7 +38,7 @@ function RecipeForm({ id, initial, imported }: { id: string | null; initial: Rec
   const [r, setR] = useState<RecipeInput>(initial);
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const set = (p: Partial<RecipeInput>) => setR((x) => ({ ...x, ...p }));
+  const set = (p: Partial<RecipeInput>) => setR((x) => ({ ...x, ...p, ...(p.ingredients || p.servings != null ? { nutrition: null } : {}) }));
   const toggle = (k: "diet_tags" | "meal_types", v: string) => set({ [k]: r[k].includes(v) ? r[k].filter((x) => x !== v) : [...r[k], v] });
 
   async function submit(e: React.FormEvent) {
@@ -65,6 +65,7 @@ function RecipeForm({ id, initial, imported }: { id: string | null; initial: Rec
         ))}
       </div>
       <section><h2 className="mb-2 text-lg">Good for</h2><div className="flex flex-wrap gap-2">{MEALS.map((m) => <Chip key={m} on={r.meal_types.includes(m)} onClick={() => toggle("meal_types", m)}>{MEAL_LABEL[m]}</Chip>)}</div></section>
+      <section><h2 className="mb-2 text-lg">Nutrition per serving</h2><div className="grid grid-cols-2 gap-3">{([['kcal', 'Calories (kcal)'], ['protein_g', 'Protein (g)']] as const).map(([key, label]) => <label key={key} className="text-sm">{label}<Input type="number" min={0} step="any" value={r.nutrition?.[key] ?? ""} onChange={(e) => { const value = e.target.value === "" ? null : Number(e.target.value); if (value == null) set({ nutrition: null }); else set({ nutrition: { kcal: r.nutrition?.kcal ?? 0, protein_g: r.nutrition?.protein_g ?? 0, [key]: value, source: 'provided' } }); }} /></label>)}</div><p className="mt-2 text-xs text-muted-foreground">Optional. Ingredient estimates are used when available.</p></section>
       <section>
         <h2 className="mb-2 text-lg">Ingredients</h2>
         <div className="space-y-2">

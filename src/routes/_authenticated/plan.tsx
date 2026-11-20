@@ -5,6 +5,8 @@ import { Lock, LockOpen, RefreshCw, Shuffle, X, Clock, Repeat, SlidersHorizontal
 import { ProfileForm } from "@/components/ProfileForm";
 import { RecipeImage } from "@/components/RecipeImage";
 import { PrepTag } from "@/components/PrepTag";
+import { NutritionLine } from "@/components/NutritionLine";
+import { CookedButton } from "@/components/CookedButton";
 import { fetchPreviousSettings, qk, type WeekSettings } from "@/lib/api";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -13,8 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { CalendarConnect } from "@/components/CalendarConnect";
 import { WeekNav } from "@/components/WeekNav";
-import { usePlan, usePrepSchedule, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
-import { DIETS, buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, sameWeekSettings, planningShortages, MEAL_LABEL, parseISODate, surpriseFor, toISODate, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
+import { useActivePlan, usePlan, usePrepSchedule, useRecipes, useSavePlan } from "@/hooks/use-mealmap";
+import { DIETS, buildEmptySlots, reconcileSlots, generatePlan, matchesDiet, matchesMeal, sameWeekSettings, planningShortages, nutritionSummary, planStartDate, MEAL_LABEL, parseISODate, surpriseFor, toISODate, weekStartOf, type Recipe, type Slot } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/plan")({
@@ -26,7 +28,8 @@ export const Route = createFileRoute("/_authenticated/plan")({
 function PlanPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/plan" });
-  const week = search.week ?? weekStartOf(new Date());
+  const active = useActivePlan();
+  const week = search.week ?? active.week;
   const { profile, slots, settings, hasWeekSettings } = usePlan(week);
   const prev = useQuery({ queryKey: qk.prevSettings(week), queryFn: () => fetchPreviousSettings(week) });
   const [editing, setEditing] = useState(false);
@@ -40,6 +43,7 @@ function PlanPage() {
   const byId = new Map(list.map((r) => [r.id, r]));
   const diets = settings?.diets ?? [];
   const hasAny = slots.some((s) => s.recipe_id);
+  const summary = nutritionSummary(slots, list);
   const shortages = planningShortages(slots, list, diets);
   const dietLabel = diets.map((d) => DIETS.find((x) => x.id === d)?.label ?? d).join(" · ");
   const invalid = slots.some((s) => { const r = s.recipe_id ? byId.get(s.recipe_id) : undefined; return r && (!matchesDiet(r, diets) || !matchesMeal(r, s.meal)); });
@@ -81,7 +85,7 @@ function PlanPage() {
              <h1 className="text-3xl">{editing ? "Just this week" : "Plan this week"}</h1>
              <p className="text-sm text-muted-foreground">{editing ? "Changes apply here only. Your usual week stays the same." : "A few quick answers and we'll fill your week."}</p>
           </div>
-          <WeekNav week={week} onChange={(w) => { setEditing(false); navigate({ search: { week: w } }); }} />
+          <WeekNav week={week} start={planStartDate(week, start.start_day)} days={start.days} onChange={(w) => { setEditing(false); navigate({ search: { week: w } }); }} />
         </div>
         {prev.data && !editing && (
           <Button size="lg" disabled={save.isPending} onClick={() => { if (prev.data) void planWeek(prev.data); }} className="mb-8 h-12 w-full rounded-lg text-base">
@@ -93,7 +97,7 @@ function PlanPage() {
           key={week + String(editing)}
           initial={{ ...p, ...start }}
           submitLabel={editing ? "Update my week" : "Plan my week"}
-          onSubmit={(d) => planWeek({ diets: d.diets, servings: d.servings, days: d.days, meals: d.meals })}
+          onSubmit={(d) => planWeek({ diets: d.diets, servings: d.servings, days: d.days, meals: d.meals, start_day: d.start_day ?? 0 })}
         />
         {editing && <Button variant="ghost" className="mt-3 w-full rounded-lg" onClick={() => setEditing(false)}>Cancel</Button>}
       </div>
@@ -115,7 +119,7 @@ function PlanPage() {
           <h1 className="text-3xl">Your week</h1>
            <p className="text-sm text-muted-foreground">Lock the keepers, reshuffle the rest.</p>
         </div>
-        <WeekNav week={week} onChange={(w) => navigate({ search: { week: w } })} />
+        <WeekNav week={week} start={planStartDate(week, settings?.start_day)} days={settings?.days ?? 7} onChange={(w) => navigate({ search: { week: w } })} />
       </div>
 
       {settings && (
@@ -124,6 +128,7 @@ function PlanPage() {
           <p className="mt-1 text-muted-foreground">{settings.servings} {settings.servings === 1 ? "person" : "people"} · {settings.days} {settings.days === 1 ? "day" : "days"} · {settings.meals.map((m) => MEAL_LABEL[m]).join(", ")}</p>
         </div>
       )}
+      {summary && <div className="mb-5 text-sm text-muted-foreground tabular"><p>Per meal: ≈ {summary.mealKcal} kcal · {summary.mealProtein} g protein</p>{summary.complete ? <p>Planned meals per day: ≈ {summary.dailyKcal} kcal · {summary.dailyProtein} g protein</p> : <p>Nutrition available for {summary.known} of {summary.total} planned meals; daily totals incomplete.</p>}<p className="mt-1 text-xs">Per person · ingredient estimates where labelled · not a full-day intake target</p></div>}
       {invalid && <p role="alert" className="mb-4 border-l-2 border-tomato pl-3 text-sm">Some saved meals don't match this week's rules. Regenerate to replace them; incompatible locks won't be kept.</p>}
       {!recipes.isLoading && shortages.length > 0 && <div role="status" className="mb-4 border-l-2 border-border pl-3 text-sm text-muted-foreground">{shortages.map((x) => <p key={x.meal}>Only {x.available} {dietLabel.toLowerCase()} {MEAL_LABEL[x.meal]?.toLowerCase()} {x.available === 1 ? "recipe matches" : "recipes match"} for {x.needed} meals. {x.available ? "Matching dishes will repeat." : "These slots stay open."} Add more recipes or relax a filter.</p>)}</div>}
       <div className="mb-6 flex flex-wrap gap-2">
@@ -160,12 +165,14 @@ function PlanPage() {
                       <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">{MEAL_LABEL[slot.meal]}</p>
                       {r ? <Link to="/recipes/$id" params={{ id: r.id }} className="line-clamp-2 font-display text-lg leading-snug">{r.title}</Link> : <p className="font-display text-lg italic text-muted-foreground">Open slot</p>}
                       {r && <p className="text-xs text-muted-foreground tabular">{r.prep_minutes + r.cook_minutes} min</p>}
+                      {r && <NutritionLine recipe={r} />}
                     </div>
-                    <Button size="sm" variant="ghost" onClick={() => setSwapping(slot)}>Swap</Button>
-                    <Button size="icon" variant="ghost" className={cn("h-8 w-8", slot.locked && "bg-highlight")} aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r}>
+                    <Button size="sm" variant="ghost" title="Choose another recipe that matches this week's diet and meal" disabled={slot.cooked || save.isPending} onClick={() => setSwapping(slot)}>Swap</Button>
+                    <Button size="icon" variant="ghost" title={slot.locked ? "Unlock so regeneration can replace this meal" : "Keep this meal when regenerating; diet rules still apply"} className={cn("h-8 w-8", slot.locked && "bg-highlight")} aria-label={slot.locked ? "Unlock" : "Lock"} onClick={() => setSlot(slot, { locked: !slot.locked })} disabled={!r || slot.cooked || save.isPending}>
                       {slot.locked ? <Lock className="h-4 w-4" /> : <LockOpen className="h-4 w-4 text-muted-foreground" />}
                     </Button>
                     </div>
+                    {r && date <= todayISO && <div className="mt-2"><CookedButton week={week} slot={slot} recipe={r} /></div>}
                     <div className="mt-2 flex flex-wrap gap-2">{prep.events.filter((e) => e.mealDate === slot.date && e.meal === slot.meal).map((e) => <PrepTag key={e.id} title={e.title} due={e.due} timezone={profile.data?.timezone ?? "UTC"} />)}</div>
                   </li>
                 );

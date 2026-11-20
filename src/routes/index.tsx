@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/SiteFooter";
 import { RecipeImage } from "@/components/RecipeImage";
 import { SEED_RECIPES } from "@/lib/seed-recipes";
-import { DIETS, buildShoppingList, formatQty, generatePlan, matchesDiet, type Recipe, type Slot } from "@/lib/mealmap";
+import { DIETS, auditRecipe, buildShoppingList, formatQty, generatePlan, matchesDiet, type Recipe, type Slot } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 const DESC = "Tell Forkcast what you want to eat and how often. It picks the week's recipes and writes your shopping list. 100% free.";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const RECIPES: Recipe[] = SEED_RECIPES.map((r, i) => ({ ...r, id: `s${i}` }) as Recipe);
+const RECIPES: Recipe[] = SEED_RECIPES.map((r, i) => auditRecipe({ ...r, id: `s${i}` }));
 const DAYS = ["Monday", "Tuesday", "Wednesday"];
 
 function seeded(n: number) { let s = n; return () => ((s = (s * 9301 + 49297) % 233280) / 233280); }

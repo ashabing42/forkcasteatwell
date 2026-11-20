@@ -32,7 +32,7 @@ describe("weekly trust rules", () => {
   it("removes a misleading gluten-free tag when soy sauce contains wheat; explicit tamari is accepted", () => {
     const unsafe = recipe("turkey", ["high-protein", "gluten-free"], [{ name: "soy sauce", quantity: 2, unit: "tbsp", category: "spices" }]);
     expect(matchesDiet(unsafe, ["gluten-free"])).toBe(false);
-    expect(auditRecipe(unsafe).diet_tags).toEqual(["high-protein"]);
+    expect(auditRecipe(unsafe).diet_tags).not.toContain("gluten-free");
     expect(containsGluten("tamari (gluten-free soy sauce)")).toBe(false);
     expect(containsGluten("rolled oats")).toBe(true);
     expect(containsGluten("rolled oats (gluten-free)")).toBe(false);

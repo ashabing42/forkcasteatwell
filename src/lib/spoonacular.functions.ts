@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { mapSpoonRecipe, searchParams, type RecipeDraft, type SpoonRecipe } from "./spoonacular";
+import { auditRecipe, matchesDiet, matchesMeal } from "./mealmap";
 
 const BASE = "https://api.spoonacular.com";
 
@@ -50,16 +51,16 @@ export type DiscoverResult = { id: number; minutes: number; recipe: RecipeDraft 
 export const discoverRecipes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { diets: string[]; meal: string | null; query: string }) => ({
-    diets: (d.diets ?? []).filter((x) => typeof x === "string").slice(0, 6).sort(),
+    diets: (d.diets ?? []).filter((x) => typeof x === "string").slice(0, 7).sort(),
     meal: d.meal && ["breakfast", "lunch", "dinner"].includes(d.meal) ? d.meal : null,
     query: String(d.query ?? "").slice(0, 80).toLowerCase().trim(),
   }))
   .handler(async ({ data }): Promise<DiscoverResult[]> => {
     const key = `search:${data.diets.join(",")}|${data.meal ?? ""}|${data.query}`;
     const hit = await cached<DiscoverResult[]>(key);
-    if (hit) return hit;
+    if (hit) return hit.map((r) => ({ ...r, recipe: auditRecipe(r.recipe) })).filter((r) => matchesDiet(r.recipe, data.diets) && (!data.meal || matchesMeal(r.recipe, data.meal)));
     const json = (await spoon("/recipes/complexSearch", searchParams(data.diets, data.meal, data.query))) as { results?: SpoonRecipe[] };
-    const results: DiscoverResult[] = (json.results ?? []).map((r) => ({ id: r.id ?? 0, minutes: r.readyInMinutes ?? 0, recipe: mapSpoonRecipe(r) }));
+    const results: DiscoverResult[] = (json.results ?? []).map((r) => ({ id: r.id ?? 0, minutes: r.readyInMinutes ?? 0, recipe: mapSpoonRecipe(r) })).filter((r) => matchesDiet(r.recipe, data.diets) && (!data.meal || matchesMeal(r.recipe, data.meal)));
     await Promise.all(results.map((r) => store(`spoon:${r.id}`, r.recipe, { spoonacular_id: r.id, source_url: r.recipe.source_url })));
     await store(key, results);
     return results;

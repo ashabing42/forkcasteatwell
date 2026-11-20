@@ -1,10 +1,11 @@
 // Pure mapping from Spoonacular recipe JSON to Forkcast's recipe shape. Shared by server functions and tests.
-import { guessCategory, suggestDietTags, suggestPrepTasks, toMetric, type Ingredient } from "./mealmap";
+import { auditRecipe, guessCategory, normalizeIngredient, suggestDietTags, suggestPrepTasks, toMetric, type Ingredient, type Nutrition } from "./mealmap";
 
 export type RecipeDraft = {
   title: string; image_url: string | null; servings: number; prep_minutes: number; cook_minutes: number;
   diet_tags: string[]; meal_types: string[]; ingredients: Ingredient[]; steps: string[];
   prep_tasks: { title: string; hours_before: number }[]; source_url: string | null;
+  nutrition?: Nutrition | null;
 };
 
 type SpoonIng = { name?: string; nameClean?: string; amount?: number; unit?: string; aisle?: string; measures?: { metric?: { amount?: number; unitShort?: string } } };
@@ -38,7 +39,7 @@ export function mapIngredient(i: SpoonIng): Ingredient {
   const unit = SPOON_UNIT[rawUnit] ?? rawUnit;
   const q = m?.amount ?? i.amount ?? null;
   const metric = toMetric(name, q == null ? null : Math.round(q * 100) / 100, unit);
-  return { name, quantity: metric.quantity, unit: metric.unit, category: aisleToCategory(i.aisle, name) };
+  return normalizeIngredient({ name, quantity: metric.quantity, unit: metric.unit, category: aisleToCategory(i.aisle, name) });
 }
 
 function stripHtml(s: string) { return s.replace(/<[^>]+>/g, "\n").split(/\n+/).map((x) => x.trim()).filter(Boolean); }
@@ -52,7 +53,8 @@ export function mapSpoonRecipe(s: SpoonRecipe): RecipeDraft {
   if (s.vegan || s.vegetarian) tags.add("vegetarian");
   if (s.glutenFree) tags.add("gluten-free");
   const nut = (n: string) => s.nutrition?.nutrients?.find((x) => x.name === n)?.amount;
-  const protein = nut("Protein"); const sugar = nut("Sugar");
+  const protein = nut("Protein"); const sugar = nut("Sugar"); const kcal = nut("Calories");
+  if (kcal != null && kcal <= 500) tags.add("low-calorie");
   if (protein != null && protein >= 25) tags.add("high-protein");
   if (sugar != null && sugar <= 10) tags.add("low-sugar");
   if (!s.nutrition) for (const t of suggestDietTags(ingredients)) if (t === "high-protein" || t === "low-sugar") tags.add(t);
@@ -65,11 +67,12 @@ export function mapSpoonRecipe(s: SpoonRecipe): RecipeDraft {
   const total = s.readyInMinutes ?? 30;
   const prep = s.preparationMinutes && s.preparationMinutes > 0 ? s.preparationMinutes : Math.min(15, total);
   const cook = s.cookingMinutes && s.cookingMinutes > 0 ? s.cookingMinutes : Math.max(0, total - prep);
-  return {
+  return auditRecipe({
     title: (s.title ?? "Untitled recipe").trim(), image_url: s.image ?? null, servings: s.servings && s.servings > 0 ? s.servings : 2,
     prep_minutes: prep, cook_minutes: cook, diet_tags: [...tags], meal_types: [...meals], ingredients, steps,
     prep_tasks: suggestPrepTasks(ingredients, steps), source_url: s.sourceUrl || s.spoonacularSourceUrl || null,
-  };
+    nutrition: kcal != null && protein != null ? { kcal, protein_g: protein, source: "provided" } : null,
+  });
 }
 
 /** Query params for complexSearch given Forkcast diets + a meal. */
@@ -80,6 +83,7 @@ export function searchParams(diets: string[], meal: string | null, query: string
   if (diets.includes("gluten-free")) p["intolerances"] = "gluten";
   if (diets.includes("high-protein")) p["minProtein"] = "25";
   if (diets.includes("low-sugar")) p["maxSugar"] = "10";
+  if (diets.includes("low-calorie")) p["maxCalories"] = "500";
   if (meal === "breakfast") p["type"] = "breakfast"; else if (meal === "lunch") p["type"] = "salad,soup,main course"; else if (meal === "dinner") p["type"] = "main course";
   return p;
 }

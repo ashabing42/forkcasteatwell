@@ -18,7 +18,7 @@ export const Route = createFileRoute("/api/public/calendar/$token")({
         const rs = (recipes ?? []) as unknown as Recipe[];
         const prof = profile as unknown as Profile;
         const events = (plans ?? []).flatMap((p) => {
-          const ws = (p.settings as unknown as { days: number; meals: string[]; servings: number } | null) ?? prof;
+          const ws = (p.settings as unknown as { days: number; meals: string[]; servings: number; start_day?: number } | null) ?? { ...prof, start_day: 0 };
           const slots = reconcileSlots(p.week_start, ws, p.slots as unknown as Slot[]);
           return [...computeMealEvents(slots, rs, prof, ws.servings), ...computePrepEvents(slots, rs, prof)];
         });

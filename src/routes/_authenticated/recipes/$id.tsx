@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useProfile, usePrepSchedule, useRecipes } from "@/hooks/use-mealmap";
 import { RecipeImage } from "@/components/RecipeImage";
 import { PrepTag, PrepTaskTag } from "@/components/PrepTag";
+import { NutritionLine } from "@/components/NutritionLine";
 import { deleteRecipe, qk } from "@/lib/api";
 import { DIETS, formatQty, toMetric, weekStartOf } from "@/lib/mealmap";
 
@@ -33,6 +34,7 @@ function RecipeView() {
           <span className="flex items-center gap-1"><Users className="h-4 w-4" /> serves {r.servings}</span>
         </div>
         <div className="mt-3 flex flex-wrap gap-x-3">{r.diet_tags.map((t) => <span key={t} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{DIETS.find((d) => d.id === t)?.label ?? t}</span>)}</div>
+        <div className="mt-3"><NutritionLine recipe={r} /></div>
       </div>
       {r.prep_tasks.length > 0 && (
         <div className="flex flex-wrap gap-2">{scheduled.length > 0 ? scheduled.map((e) => <PrepTag key={e.id} title={e.title} due={e.due} timezone={profile?.timezone ?? "UTC"} />) : r.prep_tasks.map((t, i) => <PrepTaskTag key={i} title={t.title} timing={`${t.hours_before} h before the meal`} />)}</div>

@@ -1,9 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
-import { auditRecipe, type Ingredient, type PrepTask, type Profile, type Recipe, type Slot } from "./mealmap";
+import { auditRecipe, canonicalName, freshPantryIds, pantryKey, type Ingredient, type PrepTask, type Profile, type Recipe, type Slot } from "./mealmap";
 import { SEED_RECIPES } from "./seed-recipes";
 import { USER_RECIPES } from "./user-recipes";
 
-export type ProfileRow = Profile & { id: string; onboarded: boolean; calendar_token: string };
+export type ProfileRow = Profile & { id: string; onboarded: boolean; calendar_token: string; pantry_setup_done?: boolean };
 
 async function uid(): Promise<string> {
   const { data } = await supabase.auth.getUser();
@@ -79,13 +79,13 @@ export async function deleteRecipe(id: string) {
   if (error) throw error;
 }
 
-export type WeekSettings = { diets: string[]; servings: number; days: number; meals: string[] };
-export type PlanRow = { id: string | null; week_start: string; slots: Slot[]; checked_keys: string[]; settings: WeekSettings | null };
+export type WeekSettings = { diets: string[]; servings: number; days: number; meals: string[]; start_day?: number };
+export type PlanRow = { id: string | null; week_start: string; slots: Slot[]; checked_keys: string[]; needed_keys: string[]; settings: WeekSettings | null };
 export async function fetchPlan(week_start: string): Promise<PlanRow> {
   const { data, error } = await supabase.from("meal_plans").select("*").eq("week_start", week_start).maybeSingle();
   if (error) throw error;
-  if (!data) return { id: null, week_start, slots: [], checked_keys: [], settings: null };
-  return { id: data.id, week_start, slots: (data.slots as unknown as Slot[]) ?? [], checked_keys: data.checked_keys ?? [], settings: (data.settings as unknown as WeekSettings | null) ?? null };
+  if (!data) return { id: null, week_start, slots: [], checked_keys: [], needed_keys: [], settings: null };
+  return { id: data.id, week_start, slots: (data.slots as unknown as Slot[]) ?? [], checked_keys: data.checked_keys ?? [], needed_keys: data.needed_keys ?? [], settings: (data.settings as unknown as WeekSettings | null) ?? null };
 }
 /** Most recent week before `week_start` that has its own settings. */
 export async function fetchPreviousSettings(week_start: string): Promise<WeekSettings | null> {
@@ -93,7 +93,7 @@ export async function fetchPreviousSettings(week_start: string): Promise<WeekSet
   if (error) throw error;
   return (data?.settings as unknown as WeekSettings | null) ?? null;
 }
-export async function savePlan(week_start: string, patch: { slots?: Slot[]; checked_keys?: string[]; settings?: WeekSettings }) {
+export async function savePlan(week_start: string, patch: { slots?: Slot[]; checked_keys?: string[]; needed_keys?: string[]; settings?: WeekSettings }) {
   const user_id = await uid();
   const { error } = await supabase
     .from("meal_plans")
@@ -108,7 +108,10 @@ export async function fetchCustomItems(week_start: string): Promise<CustomItem[]
   return data ?? [];
 }
 export async function addCustomItem(week_start: string, name: string, category: string) {
-  const { error } = await supabase.from("shopping_items").insert({ week_start, name, category });
+  const existing = await fetchCustomItems(week_start);
+  const duplicate = existing.find((i) => pantryKey(i.name) === pantryKey(name));
+  if (duplicate) { await toggleCustomItem(duplicate.id, false); return; }
+  const { error } = await supabase.from("shopping_items").insert({ week_start, name: canonicalName(name), category });
   if (error) throw error;
 }
 export async function toggleCustomItem(id: string, checked: boolean) {
@@ -127,11 +130,19 @@ export async function fetchPantry(): Promise<PantryItem[]> {
   return data ?? [];
 }
 export async function addPantryItem(name: string, location: string) {
-  const { error } = await supabase.from("pantry_items").insert({ name, location });
+  const existing = (await fetchPantry()).find((i) => pantryKey(i.name) === pantryKey(name));
+  if (existing) return { id: existing.id, created: false };
+  const { data, error } = await supabase.from("pantry_items").insert({ name: canonicalName(name), location }).select("id").single();
   if (error) throw error;
+  return { id: data.id, created: true };
 }
 export async function deletePantryItem(id: string) {
   const { error } = await supabase.from("pantry_items").delete().eq("id", id);
+  if (error) throw error;
+}
+export async function markMealCooked(week: string, slot: Slot, recipe: Recipe) {
+  const pantry = await fetchPantry();
+  const { error } = await supabase.rpc("mark_meal_cooked", { _week: week, _date: slot.date, _meal: slot.meal, _pantry_ids: freshPantryIds(recipe, pantry) });
   if (error) throw error;
 }
 

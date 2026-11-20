@@ -7,11 +7,11 @@ describe("spoonacular mapping", () => {
       title: "Lentil soup", servings: 4, readyInMinutes: 40, vegan: true, glutenFree: true, dishTypes: ["soup"],
       extendedIngredients: [{ name: "red lentils", aisle: "Pasta and Rice", measures: { metric: { amount: 200, unitShort: "g" } } }],
       analyzedInstructions: [{ steps: [{ step: "Simmer." }] }],
-      nutrition: { nutrients: [{ name: "Protein", amount: 30, unit: "g" }, { name: "Sugar", amount: 4, unit: "g" }] },
+      nutrition: { nutrients: [{ name: "Calories", amount: 420, unit: "kcal" }, { name: "Protein", amount: 30, unit: "g" }, { name: "Sugar", amount: 4, unit: "g" }] },
     });
     expect(r.ingredients[0]).toEqual({ name: "red lentils", quantity: 200, unit: "g", category: "pantry" });
     expect(r.steps).toEqual(["Simmer."]);
-    expect(r.diet_tags.sort()).toEqual(["gluten-free", "high-protein", "low-sugar", "vegan", "vegetarian"]);
+    expect(r.diet_tags.sort()).toEqual(["gluten-free", "high-protein", "low-calorie", "low-sugar", "vegan", "vegetarian"]);
     expect(r.meal_types).toContain("lunch");
   });
   it("turns Forkcast diets into search filters", () => {

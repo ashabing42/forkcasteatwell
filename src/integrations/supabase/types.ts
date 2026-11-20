@@ -69,6 +69,7 @@ export type Database = {
         Row: {
           checked_keys: string[]
           id: string
+          needed_keys: string[]
           settings: Json | null
           slots: Json
           updated_at: string
@@ -78,6 +79,7 @@ export type Database = {
         Insert: {
           checked_keys?: string[]
           id?: string
+          needed_keys?: string[]
           settings?: Json | null
           slots?: Json
           updated_at?: string
@@ -87,6 +89,7 @@ export type Database = {
         Update: {
           checked_keys?: string[]
           id?: string
+          needed_keys?: string[]
           settings?: Json | null
           slots?: Json
           updated_at?: string
@@ -131,8 +134,10 @@ export type Database = {
           lunch_time: string
           meals: string[]
           onboarded: boolean
+          pantry_setup_done: boolean
           servings: number
           snack_time: string
+          start_day: number
           timezone: string
         }
         Insert: {
@@ -146,8 +151,10 @@ export type Database = {
           lunch_time?: string
           meals?: string[]
           onboarded?: boolean
+          pantry_setup_done?: boolean
           servings?: number
           snack_time?: string
+          start_day?: number
           timezone?: string
         }
         Update: {
@@ -161,8 +168,10 @@ export type Database = {
           lunch_time?: string
           meals?: string[]
           onboarded?: boolean
+          pantry_setup_done?: boolean
           servings?: number
           snack_time?: string
+          start_day?: number
           timezone?: string
         }
         Relationships: []
@@ -176,6 +185,7 @@ export type Database = {
           image_url: string | null
           ingredients: Json
           meal_types: string[]
+          nutrition: Json | null
           prep_minutes: number
           prep_tasks: Json
           servings: number
@@ -192,6 +202,7 @@ export type Database = {
           image_url?: string | null
           ingredients?: Json
           meal_types?: string[]
+          nutrition?: Json | null
           prep_minutes?: number
           prep_tasks?: Json
           servings?: number
@@ -208,6 +219,7 @@ export type Database = {
           image_url?: string | null
           ingredients?: Json
           meal_types?: string[]
+          nutrition?: Json | null
           prep_minutes?: number
           prep_tasks?: Json
           servings?: number
@@ -277,6 +289,15 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_meal_cooked: {
+        Args: {
+          _date: string
+          _meal: string
+          _pantry_ids: string[]
+          _week: string
+        }
+        Returns: Json
       }
     }
     Enums: {

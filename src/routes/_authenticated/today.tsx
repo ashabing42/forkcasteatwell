@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/Doodle";
 import { PrepTag } from "@/components/PrepTag";
 import { RecipeImage } from "@/components/RecipeImage";
-import { usePlan, usePrepSchedule, useRecipes } from "@/hooks/use-mealmap";
+import { CookedButton } from "@/components/CookedButton";
+import { NutritionLine } from "@/components/NutritionLine";
+import { useActivePlan, usePrepSchedule, useRecipes } from "@/hooks/use-mealmap";
 import { addDays, buildIcs, computeMealEvents, prepDueOnDate, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/today")({
@@ -24,9 +26,9 @@ const ORDER = ["dinner", "lunch", "breakfast"];
 function Today() {
   const now = new Date();
   const today = toISODate(now);
-  const week = weekStartOf(now);
-  const { profile, slots, settings } = usePlan(week);
+  const { week, profile, slots, settings } = useActivePlan();
   const prep = usePrepSchedule(week);
+  const previousPrep = usePrepSchedule(addDays(week, -7));
   const nextPrep = usePrepSchedule(addDays(week, 7));
   const recipes = useRecipes().data ?? [];
   const byId = new Map(recipes.map((r) => [r.id, r]));
@@ -35,7 +37,7 @@ function Today() {
   const leadRecipe = lead?.recipe_id ? byId.get(lead.recipe_id) : undefined;
   const rest = meals.filter((m) => m !== lead);
   const events = prep.events;
-  const due = prepDueOnDate([...events, ...nextPrep.events], today, profile.data?.timezone ?? "UTC");
+  const due = prepDueOnDate([...previousPrep.events, ...events, ...nextPrep.events], today, profile.data?.timezone ?? "UTC");
   const leadPrep = lead ? events.filter((e) => e.mealDate === lead.date && e.meal === lead.meal && !due.some((d) => d.id === e.id)) : [];
   const leadWord = lead?.meal === "dinner" ? "Tonight" : lead ? MEAL_LABEL[lead.meal] : "Today";
 
@@ -61,6 +63,8 @@ function Today() {
           <Button asChild className="mt-4"><Link to="/plan" search={{ week: undefined }}>Plan my week</Link></Button>
         </EmptyState>
       )}
+
+      {lead && leadRecipe && <div className="flex flex-wrap items-center gap-3"><CookedButton week={week} slot={lead} recipe={leadRecipe} /><NutritionLine recipe={leadRecipe} /></div>}
 
       <section>
         <h2 className="mb-3 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep due today</h2>

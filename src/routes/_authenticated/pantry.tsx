@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { addCustomItem, addPantryItem, deletePantryItem, fetchPantry, qk } from "@/lib/api";
 import { guessCategory, weekStartOf } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
+import { PantryChecklist } from "@/components/PantryChecklist";
+import { useActivePlan } from "@/hooks/use-mealmap";
 
 export const Route = createFileRoute("/_authenticated/pantry")({
   head: () => ({ meta: [{ title: "Pantry & freezer — Forkcast" }, { name: "description", content: "Keep track of what you already have at home." }, { property: "og:title", content: "Pantry & freezer — Forkcast" }, { property: "og:description", content: "Keep track of what you already have at home." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -22,14 +24,18 @@ function Pantry() {
   const { data = [] } = useQuery({ queryKey: qk.pantry, queryFn: fetchPantry });
   const [loc, setLoc] = useState<string>("pantry");
   const [name, setName] = useState("");
+  const [checklist, setChecklist] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const refresh = () => qc.invalidateQueries({ queryKey: qk.pantry });
   const items = data.filter((i) => i.location === loc);
-  const week = weekStartOf(new Date());
+  const { week } = useActivePlan();
 
   return (
     <div>
       <h1 className="text-3xl">Pantry & freezer</h1>
       <p className="mb-5 text-sm text-muted-foreground">Things you have at home won't land on your shopping list.</p>
+      <Button variant="outline" className="mb-5" onClick={() => setChecklist((open) => !open)}>{checklist ? "Close checklist" : "Add staples in 30 seconds"}</Button>
+      {(checklist || (data.length === 0 && !dismissed)) && <div className="mb-8 border-y py-6"><PantryChecklist onDone={() => { setChecklist(false); setDismissed(true); }} /></div>}
       <div className="mb-5 inline-flex rounded-lg bg-secondary p-1">
         {LOCS.map((l) => (
           <button key={l.id} onClick={() => setLoc(l.id)} className={cn("rounded-lg px-5 py-1.5 text-sm font-medium", loc === l.id ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}>

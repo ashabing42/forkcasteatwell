@@ -43,6 +43,20 @@
       "when": 1794654237661,
       "tag": "0005_admin_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795200144064,
+      "tag": "0006_shopping_and_planning_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795200168415,
+      "tag": "0007_atomic_meal_pantry_update",
+      "breakpoints": true
     }
   ]
 }

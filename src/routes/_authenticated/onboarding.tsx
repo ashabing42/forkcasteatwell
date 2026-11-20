@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Fork } from "@/components/icons";
 import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
+import { PantryChecklist } from "@/components/PantryChecklist";
 import { useProfile } from "@/hooks/use-mealmap";
 import { fetchRecipes, qk, savePlan, saveProfile, seedRecipesIfEmpty } from "@/lib/api";
 import { buildEmptySlots, generatePlan, weekStartOf } from "@/lib/mealmap";
@@ -20,9 +21,11 @@ function Onboarding() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [done, setDone] = useState(false);
+  const [pantryDone, setPantryDone] = useState(false);
   if (!profile) return null;
   if (done) return (
     <div className="space-y-6">
+      {!pantryDone && !profile.pantry_setup_done ? <PantryChecklist onDone={() => setPantryDone(true)} /> : <>
       <div>
         <Fork className="h-8 w-8" />
         <h1 className="mt-3 text-3xl">Your week is ready</h1>
@@ -30,6 +33,7 @@ function Onboarding() {
       </div>
       <CalendarConnect token={profile.calendar_token} />
       <Button variant="outline" size="lg" className="w-full rounded-lg" onClick={() => navigate({ to: "/plan" })}>See my week</Button>
+      </>}
     </div>
   );
   return (
@@ -40,7 +44,7 @@ function Onboarding() {
         <p className="mt-2 text-muted-foreground">Three quick questions and you'll have a plan. You can change this anytime in Settings.</p>
       </div>
       <ProfileForm
-        initial={profile}
+        initial={{ ...profile, start_day: (new Date().getDay() + 6) % 7 }}
         submitLabel="Start planning"
         onSubmit={async (d) => {
           try {
@@ -48,7 +52,7 @@ function Onboarding() {
             await seedRecipesIfEmpty();
             // These answers also plan the current week, so the Plan page opens already filled.
             const week = weekStartOf(new Date());
-            const settings = { diets: d.diets, servings: d.servings, days: d.days, meals: d.meals };
+            const settings = { diets: d.diets, servings: d.servings, days: d.days, meals: d.meals, start_day: d.start_day ?? 0 };
             await savePlan(week, { settings, slots: generatePlan(buildEmptySlots(week, settings), await fetchRecipes(), d.diets) });
             await qc.invalidateQueries({ queryKey: qk.plan(week) });
             await qc.invalidateQueries({ queryKey: qk.profile });
