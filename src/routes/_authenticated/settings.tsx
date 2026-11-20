@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ProfileForm } from "@/components/ProfileForm";
 import { Button } from "@/components/ui/button";
 import { CalendarConnect } from "@/components/CalendarConnect";
+import { SupportForkcast } from "@/components/SupportForkcast";
 import { useProfile } from "@/hooks/use-mealmap";
 import { qk, saveProfile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,7 @@ function Settings() {
         <p className="mt-1 text-sm text-muted-foreground">Your private calendar of meals and prep reminders. Keep the link to yourself.</p>
         <div className="mt-4"><CalendarConnect token={profile.calendar_token} /></div>
       </section>
+      <SupportForkcast />
       {admin?.isAdmin && <Button asChild variant="outline" className="w-full rounded-lg"><Link to="/admin">Open admin</Link></Button>}
       <Button variant="outline" className="w-full rounded-lg" onClick={async () => { await qc.cancelQueries(); qc.clear(); await supabase.auth.signOut(); navigate({ to: "/auth", replace: true }); }}>Sign out</Button>
     </div>
