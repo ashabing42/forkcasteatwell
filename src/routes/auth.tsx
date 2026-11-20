@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Fork } from "@/components/icons";
 import { toast } from "sonner";
@@ -72,7 +72,10 @@ function AuthPage() {
     <div className="flex min-h-screen items-center justify-center px-5 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-secondary"><Fork className="h-7 w-7" /></div>
+          <Link to="/" aria-label="Forkcast — back to home" className="mx-auto mb-5 flex w-fit flex-col items-center gap-2 rounded-lg outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+            <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-secondary"><Fork className="h-7 w-7" /></span>
+            <span className="font-display text-2xl leading-none">Forkcast</span>
+          </Link>
           <h1 className="text-3xl">{mode === "signin" ? "Welcome back" : "Let's get you planning"}</h1>
           <p className="mt-2 text-sm text-muted-foreground">Your healthy week, sorted in a minute.</p>
         </div>
