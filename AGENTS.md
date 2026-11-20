@@ -35,4 +35,4 @@ use the editor.
 - Seed recipes are inserted per user at onboarding from src/lib/seed-recipes.ts.
 - Each week stores its own setup (diets, people, days, meals) on the meal plan; the profile only supplies defaults, so past weeks keep their own shopping amounts.
 - Admin access is checked server-side via `has_role` on `user_roles`; impersonation mints a magic-link token server-side, stashes the admin session in localStorage and restores it via setSession — so every admin action is re-verified and audited in `admin_audit`.
-- Payments: tips use inline Stripe price_data via a requireSupabaseAuth server fn in src/utils/payments.functions.ts; all Stripe calls go through createStripeClient in src/lib/stripe.server.ts (gateway keys, not real secrets).
+- Payments: tips use fixed Stripe products (tip_3/tip_5/tip_10 via lookup keys) via a requireSupabaseAuth server fn in src/utils/payments.functions.ts; all Stripe calls go through createStripeClient in src/lib/stripe.server.ts (gateway keys, not real secrets).

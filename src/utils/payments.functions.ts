@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient, getStripeErrorMessage } from "@/lib/stripe.server";
-import { isValidTip } from "@/lib/tips";
+import { isValidTip, tipPriceId } from "@/lib/tips";
 
 type CheckoutSessionResult = { clientSecret: string } | { error: string };
 
@@ -16,11 +16,13 @@ export const createTipCheckout = createServerFn({ method: "POST" })
     try {
       const email = typeof context.claims?.email === "string" ? context.claims.email : undefined;
       const stripe = createStripeClient(data.environment);
+      const priceId = tipPriceId(data.amountInCents);
+      if (!priceId) return { error: "Pick €3, €5 or €10" };
+      const prices = await stripe.prices.list({ lookup_keys: [priceId], expand: ["data.product"] });
+      const price = prices.data[0];
+      if (!price) return { error: "That tip isn't available right now" };
       const session = await stripe.checkout.sessions.create({
-        line_items: [{
-          price_data: { currency: "eur", product_data: { name: "Support Forkcast" }, unit_amount: data.amountInCents },
-          quantity: 1,
-        }],
+        line_items: [{ price: price.id, quantity: 1 }],
         mode: "payment",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
