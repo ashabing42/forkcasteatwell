@@ -11,7 +11,7 @@ import { fetchRecipes, qk, savePlan, saveProfile, seedRecipesIfEmpty } from "@/l
 import { buildEmptySlots, generatePlan, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
-  head: () => ({ meta: [{ title: "Welcome — Forkcast" }, { name: "description", content: "Set up your Forkcast diet and plan." }] }),
+  head: () => ({ meta: [{ title: "Welcome — Forkcast" }, { name: "description", content: "Set up your Forkcast diet and plan." }, { property: "og:title", content: "Welcome — Forkcast" }, { property: "og:description", content: "Set up your Forkcast diet and plan." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Onboarding,
 });
 

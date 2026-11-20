@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { IMPORT_DRAFT_KEY } from "@/lib/spoonacular";
 
 export const Route = createFileRoute("/_authenticated/recipes/$id_/edit")({
-  head: () => ({ meta: [{ title: "Edit recipe — Forkcast" }, { name: "description", content: "Add or edit a recipe." }] }),
+  head: () => ({ meta: [{ title: "Edit recipe — Forkcast" }, { name: "description", content: "Add or edit a recipe." }, { property: "og:title", content: "Edit recipe — Forkcast" }, { property: "og:description", content: "Add or edit a recipe." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: EditPage,
 });
 

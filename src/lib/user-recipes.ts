@@ -1,7 +1,7 @@
 // Recipes supplied by the MealMap owner ("20 Easy, Fast, Healthy Recipes").
 import type { Recipe } from "./mealmap";
 
-const img = (id: string) => `https://images.unsplash.com/photo-${id}?w=1000&q=80&auto=format&fit=crop`;
+const img = (_id: string): null => null; // No verified photograph for the starter dishes.
 
 export const USER_RECIPES: Omit<Recipe, "id">[] = [
  {
@@ -78,7 +78,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
   "steps": [
    "Fry the onion in the oil for 5 min until soft. Add the garlic and curry powder and cook for 1 min.",
    "Add the tomatoes, chickpeas and coconut milk. Simmer for 10 min.",
-   "Stir in the spinach until it wilts. Season and serve with rice or bread."
+   "Stir in the spinach until it wilts. Season and serve with rice or gluten-free bread."
   ],
   "prep_tasks": []
  },
@@ -583,7 +583,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
     "category": "produce"
    },
    {
-    "name": "soy sauce",
+    "name": "tamari (gluten-free soy sauce)",
     "quantity": 2,
     "unit": "tbsp",
     "category": "spices"
@@ -609,7 +609,7 @@ export const USER_RECIPES: Omit<Recipe, "id">[] = [
   ],
   "steps": [
    "Brown the mince in a hot pan for 6–7 min, breaking it up.",
-   "Add the garlic, carrot, soy sauce and sesame oil and cook for 2 min.",
+   "Add the garlic, carrot, tamari and sesame oil and cook for 2 min.",
    "Spoon into the lettuce leaves and top with the spring onions."
   ],
   "prep_tasks": [

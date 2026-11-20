@@ -14,7 +14,7 @@ import { STORES, storeLogoUrl, storeSearchUrl, plainList, type StoreId } from "@
 import { buildShoppingList, splitByPantry, CATEGORIES, CATEGORY_LABEL, formatQty, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/shopping")({
-  head: () => ({ meta: [{ title: "Shopping list — Forkcast" }, { name: "description", content: "Your week's groceries, grouped by aisle." }] }),
+  head: () => ({ meta: [{ title: "Shopping list — Forkcast" }, { name: "description", content: "Your week's groceries, grouped by aisle." }, { property: "og:title", content: "Shopping list — Forkcast" }, { property: "og:description", content: "Your week's groceries, grouped by aisle." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Shopping,
 });
 

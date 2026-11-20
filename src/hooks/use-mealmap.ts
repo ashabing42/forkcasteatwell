@@ -1,12 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPlan, fetchProfile, fetchRecipes, qk, savePlan, type WeekSettings } from "@/lib/api";
-import { reconcileSlots, type Slot } from "@/lib/mealmap";
+import { computePrepEvents, reconcileSlots, type Slot } from "@/lib/mealmap";
+import { toast } from "sonner";
 
 export function useProfile() {
   return useQuery({ queryKey: qk.profile, queryFn: fetchProfile });
 }
 export function useRecipes() {
   return useQuery({ queryKey: qk.recipes, queryFn: fetchRecipes });
+}
+export function usePrepSchedule(week: string) {
+  const { profile, plan, slots } = usePlan(week);
+  const recipes = useRecipes();
+  return {
+    events: profile.data && recipes.data ? computePrepEvents(slots, recipes.data, profile.data) : [],
+    loading: profile.isLoading || plan.isLoading || recipes.isLoading,
+  };
 }
 export function usePlan(week: string) {
   const profile = useProfile();
@@ -33,7 +42,7 @@ export function useSavePlan(week: string) {
       }));
       return { prev };
     },
-    onError: (_e, _p, ctx) => ctx && qc.setQueryData(qk.plan(week), ctx.prev),
+    onError: (_e, _p, ctx) => { if (ctx) qc.setQueryData(qk.plan(week), ctx.prev); toast.error("Couldn't save your week. Please try again."); },
     onSettled: () => { qc.invalidateQueries({ queryKey: qk.plan(week) }); qc.invalidateQueries({ queryKey: ["prevSettings"] }); },
   });
 }

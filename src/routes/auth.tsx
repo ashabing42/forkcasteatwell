@@ -15,6 +15,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to Forkcast to plan your healthy week." },
       { property: "og:title", content: "Sign in — Forkcast" },
       { property: "og:description", content: "Sign in to Forkcast to plan your healthy week." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,

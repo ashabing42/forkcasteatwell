@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useProfile, useRecipes } from "@/hooks/use-mealmap";
 import { EmptyState } from "@/components/Doodle";
+import { RecipeImage } from "@/components/RecipeImage";
 import { DIETS, DIET_TAGS, MEALS, MEAL_LABEL } from "@/lib/mealmap";
 import { qk, saveRecipe } from "@/lib/api";
 import { discoverRecipes, extractRecipeFromUrl } from "@/lib/spoonacular.functions";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 
 export const Route = createFileRoute("/_authenticated/recipes/")({
-  head: () => ({ meta: [{ title: "Recipe book — Forkcast" }, { name: "description", content: "Your recipes, plus a wider shelf to browse." }] }),
+  head: () => ({ meta: [{ title: "Recipe book — Forkcast" }, { name: "description", content: "Your recipes, plus a wider shelf to browse." }, { property: "og:title", content: "Recipe book — Forkcast" }, { property: "og:description", content: "Your recipes, plus a wider shelf to browse." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Recipes,
 });
 
@@ -56,7 +57,7 @@ function MyRecipes() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((r) => (
           <Link key={r.id} to="/recipes/$id" params={{ id: r.id }} className="group block">
-            <img src={r.image_url ?? ""} alt="" className="aspect-[4/5] w-full rounded-xl bg-muted object-cover" loading="lazy" />
+            <RecipeImage src={r.image_url} title={r.title} className="aspect-[4/5] w-full rounded-xl" />
             <div className="pt-3">
               <p className="font-display text-xl leading-snug">{r.title}</p>
               <div className="mt-1 flex flex-wrap gap-x-2">{r.diet_tags.map((t) => <span key={t} className="text-xs uppercase tracking-[0.12em] text-muted-foreground">{DIETS.find((d) => d.id === t)?.label ?? t}</span>)}</div>
@@ -145,7 +146,7 @@ function Discover() {
           const have = !!r.recipe.source_url && owned.has(r.recipe.source_url);
           return (
             <div key={r.id}>
-              <img src={r.recipe.image_url ?? ""} alt="" className="aspect-[4/5] w-full rounded-xl bg-muted object-cover" loading="lazy" />
+              <RecipeImage src={r.recipe.image_url} title={r.recipe.title} className="aspect-[4/5] w-full rounded-xl" />
               <p className="pt-3 font-display text-xl leading-snug">{r.recipe.title}</p>
               <div className="mt-1 flex flex-wrap items-center gap-x-2 text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 <span className="tabular flex items-center gap-1"><Clock className="h-3 w-3" />{r.minutes} min</span>

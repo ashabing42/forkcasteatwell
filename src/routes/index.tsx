@@ -4,6 +4,7 @@ import { Fork } from "@/components/icons";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { SiteFooter } from "@/components/SiteFooter";
+import { RecipeImage } from "@/components/RecipeImage";
 import { SEED_RECIPES } from "@/lib/seed-recipes";
 import { DIETS, buildShoppingList, formatQty, generatePlan, matchesDiet, type Recipe, type Slot } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
@@ -72,7 +73,7 @@ function Sample() {
                 return (
                   <div key={s.meal} className="flex items-center gap-3 py-1 text-sm">
                     <span className="w-14 text-xs uppercase tracking-wider text-muted-foreground">{s.meal}</span>
-                    {r?.image_url && <img src={r.image_url} alt="" className="h-9 w-9 rounded-md object-cover" />}
+                    {r && <RecipeImage src={r.image_url} title={r.title} compact className="h-9 w-9 shrink-0 rounded-md" />}
                     <span className="truncate">{r?.title ?? "—"}</span>
                   </div>
                 );

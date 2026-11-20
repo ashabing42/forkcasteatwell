@@ -1,4 +1,7 @@
 # MealMap roadmap
+- [x] Batch 1: weekly preference clarity, strict diet matching and recipe audit, shared prep details, honest photo fallbacks
+- Deferred Batch 2: shopping quantities, synonyms, staples and pantry sync, remaining days
+- Deferred Batch 3: start day, nutrition, planning control explanations
 - [x] MVP: auth (email + Google), onboarding (diet, people, days, breakfast/lunch/dinner)
 - [x] Recipe book with ~20 seeded recipes + manual recipe input/edit/delete
 - [x] Weekly plan generator (repeats allowed for batch cooking), swap/lock/regenerate, week navigation

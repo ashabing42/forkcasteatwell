@@ -3,11 +3,12 @@ import { Download } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/Doodle";
 import { PrepTag } from "@/components/PrepTag";
-import { usePlan, useRecipes } from "@/hooks/use-mealmap";
-import { buildIcs, computeMealEvents, computePrepEvents, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";
+import { RecipeImage } from "@/components/RecipeImage";
+import { usePlan, usePrepSchedule, useRecipes } from "@/hooks/use-mealmap";
+import { addDays, buildIcs, computeMealEvents, prepDueOnDate, MEAL_LABEL, toISODate, weekStartOf } from "@/lib/mealmap";
 
 export const Route = createFileRoute("/_authenticated/today")({
-  head: () => ({ meta: [{ title: "Today — Forkcast" }, { name: "description", content: "Tonight's dinner, today's meals and the prep that's due." }] }),
+  head: () => ({ meta: [{ title: "Today — Forkcast" }, { name: "description", content: "Tonight's dinner, today's meals and the prep that's due." }, { property: "og:title", content: "Today — Forkcast" }, { property: "og:description", content: "Tonight's dinner, today's meals and the prep that's due." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Today,
 });
 
@@ -24,17 +25,18 @@ function Today() {
   const now = new Date();
   const today = toISODate(now);
   const week = weekStartOf(now);
-  const { profile, slots } = usePlan(week);
+  const { profile, slots, settings } = usePlan(week);
+  const prep = usePrepSchedule(week);
+  const nextPrep = usePrepSchedule(addDays(week, 7));
   const recipes = useRecipes().data ?? [];
   const byId = new Map(recipes.map((r) => [r.id, r]));
   const meals = slots.filter((s) => s.date === today && s.recipe_id && byId.has(s.recipe_id));
   const lead = [...meals].sort((a, b) => ORDER.indexOf(a.meal) - ORDER.indexOf(b.meal))[0];
-  const leadRecipe = lead ? byId.get(lead.recipe_id!) : undefined;
+  const leadRecipe = lead?.recipe_id ? byId.get(lead.recipe_id) : undefined;
   const rest = meals.filter((m) => m !== lead);
-  const events = profile.data ? computePrepEvents(slots, recipes, profile.data) : [];
-  const end = new Date(now); end.setHours(23, 59, 59);
-  const start = new Date(now); start.setHours(0, 0, 0);
-  const due = events.filter((e) => e.due >= start && e.due <= end);
+  const events = prep.events;
+  const due = prepDueOnDate([...events, ...nextPrep.events], today, profile.data?.timezone ?? "UTC");
+  const leadPrep = lead ? events.filter((e) => e.mealDate === lead.date && e.meal === lead.meal && !due.some((d) => d.id === e.id)) : [];
   const leadWord = lead?.meal === "dinner" ? "Tonight" : lead ? MEAL_LABEL[lead.meal] : "Today";
 
   return (
@@ -50,7 +52,7 @@ function Today() {
 
       {leadRecipe ? (
         <Link to="/recipes/$id" params={{ id: leadRecipe.id }} className="-mx-4 block md:mx-0">
-          <img src={leadRecipe.image_url ?? ""} alt={leadRecipe.title} className="aspect-[4/5] w-full bg-muted object-cover sm:aspect-[16/10] md:rounded-xl" />
+          <RecipeImage src={leadRecipe.image_url} title={leadRecipe.title} className="aspect-[4/5] w-full sm:aspect-[16/10] md:rounded-xl" />
           <p className="mt-3 px-4 text-sm text-muted-foreground tabular md:px-0">{leadRecipe.prep_minutes + leadRecipe.cook_minutes} min · serves {leadRecipe.servings}</p>
         </Link>
       ) : (
@@ -62,28 +64,29 @@ function Today() {
 
       <section>
         <h2 className="mb-3 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep due today</h2>
-        {due.length === 0 ? (
-          <p className="text-muted-foreground">No prep today. Put the kettle on.</p>
+         {prep.loading || nextPrep.loading ? <p className="text-muted-foreground">Checking prep…</p> : due.length === 0 ? (
+           <p className="text-muted-foreground">No prep due today.</p>
         ) : (
           <ul className="space-y-3">
             {due.map((e) => (
               <li key={e.id} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <PrepTag title={e.title} due={e.due} />
+                 <PrepTag title={e.title} due={e.due} timezone={profile.data?.timezone ?? "UTC"} />
                 <span className="text-sm text-muted-foreground">for {e.recipeTitle}</span>
               </li>
             ))}
           </ul>
         )}
       </section>
+       {leadPrep.length > 0 && <section><h2 className="mb-3 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Prep for {leadRecipe?.title}</h2><div className="flex flex-wrap gap-2">{leadPrep.map((e) => <PrepTag key={e.id} title={e.title} due={e.due} timezone={profile.data?.timezone ?? "UTC"} />)}</div></section>}
 
       {rest.length > 0 && (
         <section>
           <h2 className="mb-1 font-sans text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Also today</h2>
           <ul>
-            {rest.map((s) => { const r = byId.get(s.recipe_id!)!; return (
+            {rest.map((s) => { const r = s.recipe_id ? byId.get(s.recipe_id) : undefined; if (!r) return null; return (
               <li key={s.meal} className="dotted-rule">
                 <Link to="/recipes/$id" params={{ id: r.id }} className="flex items-center gap-4 py-3">
-                  <img src={r.image_url ?? ""} alt="" className="h-14 w-14 rounded-lg bg-muted object-cover" />
+                  <RecipeImage src={r.image_url} title={r.title} compact className="h-14 w-14 shrink-0 rounded-lg" />
                   <div><p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">{MEAL_LABEL[s.meal]}</p><p className="font-display text-xl">{r.title}</p></div>
                 </Link>
               </li>); })}
@@ -91,8 +94,8 @@ function Today() {
         </section>
       )}
 
-      {events.length > 0 && (
-        <Button variant="outline" onClick={() => downloadIcs(buildIcs([...computeMealEvents(slots, recipes, profile.data!), ...events]), `forkcast-${week}.ics`)}><Download className="mr-2 h-4 w-4" /> Add this week to my calendar</Button>
+      {events.length > 0 && profile.data && (
+        <Button variant="outline" onClick={() => { if (profile.data) downloadIcs(buildIcs([...computeMealEvents(slots, recipes, profile.data, settings?.servings), ...events]), `forkcast-${week}.ics`); }}><Download className="mr-2 h-4 w-4" /> Add this week to my calendar</Button>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Ingredient, PrepTask, Profile, Recipe, Slot } from "./mealmap";
+import { auditRecipe, type Ingredient, type PrepTask, type Profile, type Recipe, type Slot } from "./mealmap";
 import { SEED_RECIPES } from "./seed-recipes";
 import { USER_RECIPES } from "./user-recipes";
 
@@ -31,12 +31,12 @@ export async function saveProfile(patch: Partial<ProfileRow>) {
 }
 
 function toRecipe(r: Record<string, unknown>): Recipe {
-  return {
+  return auditRecipe({
     ...(r as unknown as Recipe),
     ingredients: (r["ingredients"] as Ingredient[]) ?? [],
     steps: (r["steps"] as string[]) ?? [],
     prep_tasks: (r["prep_tasks"] as PrepTask[]) ?? [],
-  };
+  });
 }
 
 export async function fetchRecipes(): Promise<Recipe[]> {
@@ -64,7 +64,7 @@ export async function seedRecipesIfEmpty() {
 
 export type RecipeInput = Omit<Recipe, "id">;
 export async function saveRecipe(id: string | null, r: RecipeInput): Promise<string> {
-  const payload = { ...r } as never;
+  const payload = auditRecipe(r) as never;
   if (id) {
     const { error } = await supabase.from("recipes").update(payload).eq("id", id);
     if (error) throw error;

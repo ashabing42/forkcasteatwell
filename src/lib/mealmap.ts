@@ -85,9 +85,39 @@ export function weekStartOf(d: Date): string {
 }
 
 // ---------- planning ----------
-export function matchesDiet(recipe: Pick<Recipe, "diet_tags">, diets: string[]): boolean {
+export function matchesDiet(recipe: Pick<Recipe, "diet_tags"> & Partial<Pick<Recipe, "ingredients">>, diets: string[]): boolean {
   const req = diets.filter((d) => d !== "balanced");
-  return req.every((d) => recipe.diet_tags.includes(d));
+  return req.every((d) => recipe.diet_tags.includes(d)) &&
+    (!req.includes("gluten-free") || !recipe.ingredients?.some((i) => containsGluten(i.name)));
+}
+/** Conservative ingredient audit; gluten-free alternatives must be explicit. */
+export function containsGluten(name: string): boolean {
+  const n = name.toLowerCase();
+  if (/gluten[- ]free/.test(n)) return false;
+  if (/tamari/.test(n) && !/\bor\b/.test(n)) return false;
+  return /\b(flour|bread|pasta|spaghetti|noodles?|couscous|barley|wheat|wholewheat|tortillas?|wraps?|breadcrumbs?|soy sauce|buns?|pita|crackers?|rye|oats?|granola|seitan|croutons?)\b/.test(n);
+}
+
+/** Old starter photos were borrowed, not photographs of these dishes. */
+const BORROWED_PHOTOS = /photo-(?:1455619452474-d2be8b1e70cd|1569718212165-3a8278d5f624|1599020792689-9fde458e7e17|1547592180-85f173990554|1517673400267-0251440c45dc|1512058564366-18510be2db19|1488477181946-6428a0291777|1515543237350-b3eea1ec8082|1529042410759-befb1204b468|1467003909585-2f8a72700288|1482049016688-2d3e1b311543|1473093295043-cdd812d0e601|1505576399279-565b52d4ac71|1511690656952-34342bb7c2f2|1540189549336-e6e99c3679fe|1504674900247-0877df9cc836|1476124369491-e7addf5db371|1516684732162-798a0062be99|1546069901-ba9599a7e63c|1525351484163-7529414344d8|1512621776951-a57141f2eefd|1543339308-43e59d6b73a6)/;
+export function auditRecipe<T extends Omit<Recipe, "id">>(recipe: T): T {
+  return { ...recipe,
+    image_url: recipe.image_url && BORROWED_PHOTOS.test(recipe.image_url) ? null : recipe.image_url,
+    diet_tags: recipe.diet_tags.filter((tag) => tag !== "gluten-free" || !recipe.ingredients.some((i) => containsGluten(i.name))),
+  };
+}
+
+export type PlanningSettings = Pick<Profile, "diets" | "servings" | "days" | "meals">;
+export function sameWeekSettings(a: PlanningSettings, b: PlanningSettings): boolean {
+  const same = (x: string[], y: string[]) => [...x].sort().join("|") === [...y].sort().join("|");
+  return a.servings === b.servings && a.days === b.days && same(a.diets, b.diets) && same(a.meals, b.meals);
+}
+export function planningShortages(slots: Slot[], recipes: Recipe[], diets: string[]) {
+  return [...new Set(slots.map((s) => s.meal))].map((meal) => ({
+    meal,
+    needed: slots.filter((s) => s.meal === meal).length,
+    available: recipes.filter((r) => matchesDiet(r, diets) && matchesMeal(r, meal)).length,
+  })).filter((x) => x.available < x.needed);
 }
 export function matchesMeal(recipe: Pick<Recipe, "meal_types">, meal: string): boolean {
   return recipe.meal_types.length === 0 || recipe.meal_types.includes(meal);
@@ -110,21 +140,23 @@ export function reconcileSlots(weekStart: string, profile: Pick<Profile, "days" 
 
 /**
  * Fill every unlocked slot with a diet- and meal-matching recipe, avoiding repeats in the week
- * where possible. Locked slots are kept as-is.
+ * where possible. Locks are kept only when the recipe still matches the active rules.
  */
 export function generatePlan(slots: Slot[], recipes: Recipe[], diets: string[], rand: () => number = Math.random): Slot[] {
   const eligible = recipes.filter((r) => matchesDiet(r, diets));
+  const validLock = (s: Slot) => s.locked && eligible.some((r) => r.id === s.recipe_id && matchesMeal(r, s.meal));
   const used = new Map<string, number>();
-  for (const s of slots) if (s.locked && s.recipe_id) used.set(s.recipe_id, (used.get(s.recipe_id) ?? 0) + 1);
+  for (const s of slots) if (validLock(s) && s.recipe_id) used.set(s.recipe_id, (used.get(s.recipe_id) ?? 0) + 1);
   return slots.map((s) => {
-    if (s.locked) return s;
+    if (validLock(s)) return s;
     const pool = eligible.filter((r) => matchesMeal(r, s.meal));
-    if (pool.length === 0) return { ...s, recipe_id: null };
+    if (pool.length === 0) return { ...s, recipe_id: null, locked: false };
     const minUse = Math.min(...pool.map((r) => used.get(r.id) ?? 0));
     const least = pool.filter((r) => (used.get(r.id) ?? 0) === minUse);
-    const pick = least[Math.floor(rand() * least.length)]!;
+    const pick = least[Math.floor(rand() * least.length)];
+    if (!pick) return { ...s, recipe_id: null, locked: false };
     used.set(pick.id, (used.get(pick.id) ?? 0) + 1);
-    return { ...s, recipe_id: pick.id };
+    return { ...s, recipe_id: pick.id, locked: false };
   });
 }
 
@@ -133,7 +165,7 @@ export function surpriseFor(slot: Slot, slots: Slot[], recipes: Recipe[], diets:
   const pool = recipes.filter((r) => matchesDiet(r, diets) && matchesMeal(r, slot.meal) && r.id !== slot.recipe_id);
   const fresh = pool.filter((r) => !inWeek.has(r.id));
   const from = fresh.length ? fresh : pool;
-  return from.length ? from[Math.floor(rand() * from.length)]!.id : null;
+  return from[Math.floor(rand() * from.length)]?.id ?? null;
 }
 
 // ---------- shopping ----------
@@ -351,6 +383,15 @@ export function computePrepEvents(slots: Slot[], recipes: Recipe[], profile: Pro
 }
 
 // ---------- ICS ----------
+export function prepDueOnDate(events: PrepEvent[], date: string, timezone: string): PrepEvent[] {
+  const formatter = new Intl.DateTimeFormat("en-CA", { timeZone: timezone, year: "numeric", month: "2-digit", day: "2-digit" });
+  return events.filter((e) => {
+    const parts = formatter.formatToParts(e.due);
+    const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+    return `${get("year")}-${get("month")}-${get("day")}` === date;
+  });
+}
+
 function icsDate(d: Date): string {
   return d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
@@ -415,7 +456,7 @@ export function suggestDietTags(ingredients: Ingredient[]): string[] {
   const has = (re: RegExp) => names.some((n) => re.test(n));
   const tags: string[] = [];
   const meaty = has(MEAT) || has(SEAFOOD);
-  const glutenFree = names.every((n) => !GLUTEN.test(n) || /gluten[- ]free|tamari/.test(n));
+  const glutenFree = names.every((n) => !containsGluten(n));
   if (!meaty) tags.push("vegetarian");
   if (!meaty && !has(DAIRY_EGG)) tags.push("vegan");
   if (!has(SUGARY)) tags.push("low-sugar");

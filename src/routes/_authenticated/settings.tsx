@@ -12,7 +12,7 @@ import { qk, saveProfile } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/settings")({
-  head: () => ({ meta: [{ title: "Settings — Forkcast" }, { name: "description", content: "Diet, servings and reminder settings." }] }),
+  head: () => ({ meta: [{ title: "Your usual week — Forkcast" }, { name: "description", content: "Your default diet, household size, meals and prep reminder times." }, { property: "og:title", content: "Your usual week — Forkcast" }, { property: "og:description", content: "Your default diet, household size, meals and prep reminder times." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Settings,
 });
 
@@ -24,7 +24,7 @@ function Settings() {
   if (!profile) return null;
   return (
     <div className="space-y-10">
-      <h1 className="text-3xl">Settings</h1>
+      <header><h1 className="text-3xl">Your usual week</h1><p className="mt-2 text-sm text-muted-foreground">Defaults for new weeks. Weeks you've already planned stay as they are.</p></header>
       <ProfileForm initial={profile} showTimes submitLabel="Save changes" onSubmit={async (d) => {
         await saveProfile({ ...d, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone });
         await qc.invalidateQueries({ queryKey: qk.profile });

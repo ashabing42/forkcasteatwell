@@ -15,12 +15,12 @@ describe("MealMap rules", () => {
     const a = r("a", [], [{ name: "rice", quantity: 1, unit: "cup", category: "pantry" }], 2);
     expect(buildShoppingList([{ date: "2026-01-05", meal: "dinner", recipe_id: "a", locked: false }], [a], 4)[0]!.quantity).toBe(380);
   });
-  it("only plans recipes matching every chosen diet and keeps locked slots", () => {
+  it("only plans recipes matching every chosen diet, even when an incompatible meal was locked", () => {
     const vegan = r("v", ["vegan"], []); const meat = r("m", [], []);
     const slots = buildEmptySlots("2026-01-05", { days: 3, meals: ["dinner"] });
     slots[0] = { ...slots[0]!, recipe_id: "m", locked: true };
     const out = generatePlan(slots, [vegan, meat], ["vegan"]);
-    expect(out[0]!.recipe_id).toBe("m");
+    expect(out[0]?.recipe_id).toBe("v");
     expect(out.slice(1).every((s) => s.recipe_id === "v")).toBe(true);
   });
 });

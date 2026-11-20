@@ -32,6 +32,8 @@ use the editor.
 ## Project rules
 - Domain logic (planning, shopping aggregation, prep scheduling, ICS) lives in pure functions in src/lib/mealmap.ts so it is unit-testable and shared by the UI and the calendar feed route.
 - Prep reminders are computed from the saved plan on demand, not stored, so they always reflect the current plan.
+- Recipe reads and saves run the pure ingredient audit; mismatched gluten-free tags are removed and borrowed starter photos use the shared RecipeImage fallback, so old accounts get the same safeguards as new ones.
+- Locked meals must still satisfy the active diet and meal rules; changed weekly preferences cannot preserve an incompatible lock.
 - Seed recipes are inserted per user at onboarding from src/lib/seed-recipes.ts.
 - Each week stores its own setup (diets, people, days, meals) on the meal plan; the profile only supplies defaults, so past weeks keep their own shopping amounts.
 - Admin access is checked server-side via `has_role` on `user_roles`; impersonation mints a magic-link token server-side, stashes the admin session in localStorage and restores it via setSession — so every admin action is re-verified and audited in `admin_audit`.

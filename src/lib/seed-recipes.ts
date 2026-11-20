@@ -1,6 +1,6 @@
 import type { Ingredient, PrepTask, Recipe } from "./mealmap";
 
-const img = (id: string) => `https://images.unsplash.com/photo-${id}?w=1000&q=80&auto=format&fit=crop`;
+const img = (_id: string): null => null; // No verified photograph for the starter dishes.
 const i = (name: string, quantity: number | null, unit: string, category: string): Ingredient => ({ name, quantity, unit, category });
 const V = "vegan", VG = "vegetarian", LS = "low-sugar", HP = "high-protein", GF = "gluten-free";
 
@@ -8,7 +8,7 @@ type Seed = Omit<Recipe, "id"> & { prep_tasks: PrepTask[] };
 
 export const SEED_RECIPES: Seed[] = [
   { title: "Berry Overnight Oats", image_url: img("1517673400267-0251440c45dc"), servings: 2, prep_minutes: 10, cook_minutes: 0, diet_tags: [V, VG, GF], meal_types: ["breakfast"],
-    ingredients: [i("rolled oats (gluten-free)", 1, "cup", "pantry"), i("oat milk", 1.5, "cup", "dairy"), i("chia seeds", 2, "tbsp", "pantry"), i("mixed berries", 1, "cup", "produce"), i("maple syrup", 1, "tbsp", "pantry")],
+    ingredients: [i("rolled oats (gluten-free)", 1, "cup", "pantry"), i("oat milk (gluten-free)", 1.5, "cup", "dairy"), i("chia seeds", 2, "tbsp", "pantry"), i("mixed berries", 1, "cup", "produce"), i("maple syrup", 1, "tbsp", "pantry")],
     steps: ["Stir oats, oat milk and chia in a jar.", "Refrigerate overnight.", "Top with berries and a drizzle of maple syrup."],
     prep_tasks: [{ title: "Make overnight oats", hours_before: 10 }] },
   { title: "Greek Yogurt Power Bowl", image_url: img("1488477181946-6428a0291777"), servings: 1, prep_minutes: 5, cook_minutes: 0, diet_tags: [VG, HP, GF, LS], meal_types: ["breakfast"],

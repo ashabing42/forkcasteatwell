@@ -11,7 +11,7 @@ import { guessCategory, weekStartOf } from "@/lib/mealmap";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pantry")({
-  head: () => ({ meta: [{ title: "Pantry & freezer — Forkcast" }, { name: "description", content: "Keep track of what you already have at home." }] }),
+  head: () => ({ meta: [{ title: "Pantry & freezer — Forkcast" }, { name: "description", content: "Keep track of what you already have at home." }, { property: "og:title", content: "Pantry & freezer — Forkcast" }, { property: "og:description", content: "Keep track of what you already have at home." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Pantry,
 });
 
