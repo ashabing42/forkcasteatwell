@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Archive, Copy, Plus, Search, Trash2 } from "@/components/icons";
+import { Jar, Copy, Plus, Search, Trash2 } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -72,13 +72,13 @@ function Shopping() {
     });
   }
   const SearchLink = ({ item }: { item: string }) => <a href={storeSearchUrl(store, item)} target="_blank" rel="noopener noreferrer" aria-label={`Search ${item} at ${storeLabel}`} title={`Search at ${storeLabel}`} className="p-2"><Search className="h-4 w-4 text-muted-foreground" /></a>;
-  const HomeButton = ({ item, category, customId }: { item: string; category: string; customId?: string }) => <Button type="button" size="icon" variant="ghost" disabled={busy} aria-label={`I have ${item} at home`} title="Already have it — move to pantry" onClick={() => stock(item, category, undefined, customId)}><Archive className="h-4 w-4" /></Button>;
+  const HomeButton = ({ item, category, customId }: { item: string; category: string; customId?: string }) => <Button type="button" size="sm" variant="outline" className="shrink-0 border-primary/40 text-primary" disabled={busy} aria-label={`I have ${item} at home`} title="Already have it — move to pantry" onClick={() => stock(item, category, undefined, customId)}><Jar className="h-4 w-4" />In pantry</Button>;
   function Line({ l }: { l: ShoppingLine }) {
     const on = checked.includes(l.key);
     return <li className="dotted-rule flex items-start gap-3 py-3">
       <Checkbox className="mt-1 h-5 w-5 shrink-0" aria-label={`Bought ${l.name}`} disabled={busy} checked={on} onCheckedChange={(v) => { if (v) void stock(l.name, l.category, l.key, undefined, true); else void run(async () => { await save.mutateAsync({ slots, checked_keys: checked.filter((k) => k !== l.key) }); }); }} />
-      <div className="min-w-0 flex-1"><span data-on={on} className={on ? "scribble text-muted-foreground" : "scribble"}>{shoppingName(l)}</span><details className="mt-1 text-xs text-muted-foreground"><summary className="cursor-pointer">Used in {l.recipeTitles?.length ?? 0} recipes</summary>{l.recipeTitles?.join(" · ")}</details></div>
-      <span className="pt-1 text-sm text-muted-foreground tabular whitespace-nowrap">{formatQty(l.quantity, l.unit)}</span><SearchLink item={l.name} /><HomeButton item={l.name} category={l.category} />
+      <div className="min-w-0 flex-1"><span data-on={on} className={on ? "scribble text-muted-foreground" : "scribble"}>{shoppingName(l)}</span> <span className="ml-1 text-sm text-muted-foreground tabular whitespace-nowrap">{formatQty(l.quantity, l.unit)}</span><details className="mt-1 text-xs text-muted-foreground"><summary className="cursor-pointer">Used in {l.recipeTitles?.length ?? 0} recipes</summary>{l.recipeTitles?.join(" · ")}</details></div>
+      <SearchLink item={l.name} /><HomeButton item={l.name} category={l.category} />
     </li>;
   }
   return <div>

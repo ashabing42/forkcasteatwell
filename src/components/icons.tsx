@@ -9,6 +9,7 @@ const wrap = (I: React.ComponentType<Props>) => {
 };
 
 export const Archive = wrap(P.ArchiveIcon);
+export const Jar = wrap(P.JarLabelIcon);
 export const ArrowLeft = wrap(P.ArrowLeftIcon);
 export const ArrowRight = wrap(P.ArrowRightIcon);
 export const Bell = wrap(P.BellSimpleIcon);

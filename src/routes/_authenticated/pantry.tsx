@@ -48,7 +48,7 @@ function Pantry() {
         <Button type="submit" size="icon" className="h-11 w-11 shrink-0 rounded-lg" aria-label="Add"><Plus className="h-5 w-5" /></Button>
       </form>
       {items.length === 0 ? (
-        <EmptyState kind="jar"><p>Empty shelf. Add what you have, or tap the box icon on your shopping list.</p></EmptyState>
+        <EmptyState kind="jar"><p>Empty shelf. Add what you have, or tap "In pantry" on your shopping list.</p></EmptyState>
       ) : (
         <ul>
           {items.map((i) => (

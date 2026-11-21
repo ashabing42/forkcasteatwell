@@ -4,7 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { checkIsAdmin } from "@/lib/admin.functions";
 import { getImpersonation, stopImpersonation } from "@/lib/impersonation";
-import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Archive, Fork, Users } from "@/components/icons";
+import { BookOpen, CalendarDays, Settings, ShoppingBasket, Sun, Jar, Fork, Users } from "@/components/icons";
 import { fetchProfile, qk } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ const TABS = [
   { to: "/today", label: "Today", icon: Sun },
   { to: "/plan", label: "Plan", icon: CalendarDays },
   { to: "/shopping", label: "Shopping", icon: ShoppingBasket },
-  { to: "/pantry", label: "Pantry", icon: Archive },
+  { to: "/pantry", label: "Pantry", icon: Jar },
   { to: "/recipes", label: "Recipes", icon: BookOpen },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
